@@ -1,0 +1,4 @@
+fpdf2>=2.7.0
+fastapi>=0.110.0
+uvicorn>=0.29.0
+pydantic[email]>=2.0.0
