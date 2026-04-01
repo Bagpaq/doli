@@ -1,0 +1,12 @@
+# Environment
+.env
+
+# Agent runtime data (logs, DB, workspace files)
+data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
