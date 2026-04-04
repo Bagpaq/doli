@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appointment Cancelled — {{clinic_name}}</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f7fb;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      color: #333333;
+    }
+    .wrapper {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .header {
+      background: linear-gradient(135deg, #546e7a 0%, #37474f 100%);
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      color: #ffffff;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    .header p {
+      margin: 8px 0 0;
+      color: rgba(255,255,255,0.80);
+      font-size: 14px;
+    }
+    .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .content {
+      padding: 40px 32px;
+    }
+    .greeting {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin: 0 0 12px;
+    }
+    .intro {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #555;
+      margin: 0 0 28px;
+    }
+    .cancelled-card {
+      background: #fafafa;
+      border-left: 4px solid #90a4ae;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+    .cancelled-card h2 {
+      margin: 0 0 16px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #546e7a;
+    }
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+    .detail-label {
+      font-weight: 600;
+      color: #444;
+      min-width: 90px;
+      text-decoration: line-through;
+      text-decoration-color: #bbb;
+    }
+    .detail-value {
+      color: #888;
+      text-decoration: line-through;
+      text-decoration-color: #bbb;
+    }
+    .rebook-box {
+      background: #e8f5e9;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    .rebook-box p {
+      margin: 0 0 16px;
+      font-size: 15px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .cta-button {
+      display: inline-block;
+      background: #1a73e8;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 13px 28px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .footer {
+      background: #f4f7fb;
+      padding: 24px 32px;
+      text-align: center;
+      border-top: 1px solid #e8edf3;
+    }
+    .footer p {
+      margin: 4px 0;
+      font-size: 13px;
+      color: #888;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Header -->
+    <div class="header">
+      <span class="icon">📋</span>
+      <h1>Appointment Cancelled</h1>
+      <p>{{clinic_name}}</p>
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+      <p class="greeting">Hi {{patient_name}},</p>
+      <p class="intro">
+        This email confirms that your dental appointment has been successfully
+        cancelled. We're sorry we won't be seeing you — please don't hesitate
+        to rebook whenever you're ready.
+      </p>
+
+      <!-- Cancelled appointment details -->
+      <div class="cancelled-card">
+        <h2>Cancelled Appointment</h2>
+        <div class="detail-row">
+          <span class="detail-label">Date &amp; Time</span>
+          <span class="detail-value">{{appointment_datetime}}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Location</span>
+          <span class="detail-value">{{clinic_address}}</span>
+        </div>
+      </div>
+
+      <!-- Rebook prompt -->
+      <div class="rebook-box">
+        <p>
+          Your oral health is important to us. When you're ready to book your
+          next appointment, we'd love to welcome you back!
+        </p>
+        <a href="tel:{{clinic_phone}}" class="cta-button">Book a New Appointment</a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>{{clinic_name}}</strong></p>
+      <p>{{clinic_address}}</p>
+      <p>{{clinic_phone}}</p>
+      <p style="margin-top: 12px; font-size: 12px; color: #aaa;">
+        This cancellation notice was sent by Sophia, your AI dental receptionist.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

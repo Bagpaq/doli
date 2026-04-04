@@ -1,0 +1,18 @@
+# ── Core agent framework ──────────────────────────────────────────────
+livekit-agents[openai,silero]>=0.12.0
+livekit>=0.18.0
+
+# ── OpenAI (Realtime API via livekit-agents plugin) ──────────────────
+openai>=1.30.0
+
+# ── Google APIs ──────────────────────────────────────────────────────
+google-auth>=2.29.0
+google-auth-oauthlib>=1.2.0
+google-api-python-client>=2.130.0
+
+# ── Config / environment ─────────────────────────────────────────────
+pyyaml>=6.0.1
+python-dotenv>=1.0.1
+
+# ── Utilities ────────────────────────────────────────────────────────
+python-dateutil>=2.9.0

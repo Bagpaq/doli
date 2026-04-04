@@ -1,0 +1,114 @@
+# ============================================================
+# Sophia — AI Dental Receptionist Configuration
+# Edit this file to customise Sophia for your clinic.
+# ============================================================
+
+clinic:
+  name: "Bright Smile Dental"
+  address: "123 Maplewood Drive, Suite 4, Austin, TX 78701"
+  phone: "(512) 555-0199"
+  email: "hello@brightsmileaustin.com"
+  website: "https://brightsmileaustin.com"
+  timezone: "America/Chicago"
+
+# ------------------------------------------------------------
+# Agent persona
+# ------------------------------------------------------------
+agent:
+  name: Sophia
+  voice: shimmer          # OpenAI Realtime: shimmer = warm, low-tone female
+  temperature: 0.6        # Low for consistent, professional responses
+
+  personality: >
+    You are Sophia, the warm and professional virtual receptionist for Bright
+    Smile Dental. You speak in a calm, soft, reassuring tone — like a trusted
+    friend who happens to work at a dental office. You are never robotic, never
+    rushed, and always make patients feel at ease.
+
+    Your goal is to help patients book, reschedule, or cancel appointments
+    efficiently and warmly. Always confirm details back to the patient before
+    finalising anything. Never make up available time slots — always check the
+    calendar tool first. If you cannot help, offer to have a human call them back.
+
+  greeting: >
+    Hello, thank you for calling Bright Smile Dental. This is Sophia speaking.
+    How can I help you today?
+
+# ------------------------------------------------------------
+# Business hours  (displayed to patients in FAQ answers)
+# ------------------------------------------------------------
+hours:
+  Monday:    "8:00 AM – 5:00 PM"
+  Tuesday:   "8:00 AM – 5:00 PM"
+  Wednesday: "8:00 AM – 5:00 PM"
+  Thursday:  "8:00 AM – 5:00 PM"
+  Friday:    "8:00 AM – 5:00 PM"
+  Saturday:  "9:00 AM – 1:00 PM"
+  Sunday:    "Closed"
+
+# Booking window Sophia will check on Google Calendar
+booking_hours:
+  start: "08:00"
+  end:   "17:00"
+  saturday_end: "13:00"
+
+# Default appointment duration in minutes
+default_appointment_duration: 60
+
+# ------------------------------------------------------------
+# Frequently asked questions
+# Sophia reads these directly — edit freely.
+# ------------------------------------------------------------
+faq:
+  insurance: >
+    We accept most major dental insurance plans including Delta Dental,
+    Cigna, Aetna, BlueCross BlueShield, and MetLife. We also offer
+    flexible payment plans for uninsured patients. Please have your
+    insurance card ready when you arrive.
+
+  parking: >
+    We have free parking available in the lot directly behind our building
+    on Maplewood Drive. There are also two accessible parking spaces near
+    the main entrance.
+
+  emergency: >
+    For dental emergencies during business hours, please call us immediately
+    at (512) 555-0199 and we will do our best to see you the same day.
+    For after-hours dental emergencies, please call our emergency line at
+    (512) 555-0911. If you are experiencing severe pain, swelling, or
+    difficulty breathing, please call 911 or go to the nearest emergency room.
+
+  new_patients: >
+    New patients are always welcome! Please arrive 15 minutes early to
+    complete your new patient paperwork, or ask us to email the forms
+    in advance so you can complete them at home.
+
+  what_to_bring: >
+    Please bring a valid photo ID, your dental insurance card, a list of
+    any current medications, and any recent dental X-rays if you have them.
+
+  teeth_whitening: >
+    Yes, we offer professional in-office teeth whitening treatments as well
+    as custom take-home whitening kits. Results typically last 12 to
+    18 months with proper care. Ask about our current promotions!
+
+  payment: >
+    We accept cash, all major credit cards, debit cards, and CareCredit
+    financing. Payment is due at the time of service.
+
+  cancellation_policy: >
+    We kindly ask for at least 24 hours notice if you need to cancel or
+    reschedule. Late cancellations or no-shows may be subject to a
+    $50 fee. We understand that emergencies happen — please just let us know.
+
+# ------------------------------------------------------------
+# Google integration
+# Actual values are loaded from environment variables.
+# Set the env vars in .env — these are just fallback placeholders.
+# ------------------------------------------------------------
+google:
+  calendar_id: "${GOOGLE_CALENDAR_ID}"
+  service_account_json_path: "${GOOGLE_SERVICE_ACCOUNT_JSON_PATH}"
+
+gmail:
+  sender_email: "${GMAIL_SENDER_EMAIL}"

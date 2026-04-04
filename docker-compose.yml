@@ -1,0 +1,76 @@
+version: "3.9"
+
+# ============================================================
+# Sophia — Dental Voice Agent  |  Docker Compose
+# ============================================================
+#
+# Services:
+#   sophia-agent    — inbound call handler (LiveKit agent worker)
+#   reminder-cron   — daily outbound reminder scheduler
+#
+# Usage:
+#   cp .env.example .env        # fill in your credentials
+#   docker compose up --build
+# ============================================================
+
+services:
+
+  # ── Inbound agent ───────────────────────────────────────────────────
+  sophia-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sophia-dental-agent:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PYTHONPATH: /app/agent
+    volumes:
+      # Mount Google service account key (never bake secrets into the image)
+      - ${GOOGLE_SERVICE_ACCOUNT_JSON_PATH:-./secrets/google-service-account.json}:/run/secrets/google-service-account.json:ro
+      - ./config:/app/config:ro
+      - ./templates:/app/templates:ro
+    command: ["python", "main.py", "start"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import livekit; print('ok')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # ── Outbound reminder cron ──────────────────────────────────────────
+  reminder-cron:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sophia-dental-agent:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PYTHONPATH: /app/agent
+    volumes:
+      - ${GOOGLE_SERVICE_ACCOUNT_JSON_PATH:-./secrets/google-service-account.json}:/run/secrets/google-service-account.json:ro
+      - ./config:/app/config:ro
+      - ./templates:/app/templates:ro
+    # Run at 10:00 AM daily via supercronic-style entrypoint
+    command: >
+      sh -c "
+        while true; do
+          HOUR=$(date +%H);
+          MINUTE=$(date +%M);
+          if [ \"$$HOUR\" = \"10\" ] && [ \"$$MINUTE\" = \"00\" ]; then
+            python -m outbound.reminder_caller;
+          fi;
+          sleep 60;
+        done
+      "
+    working_dir: /app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
