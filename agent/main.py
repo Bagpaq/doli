@@ -1,17 +1,18 @@
 """
 Dental Voice Agent - LiveKit entrypoint
 Connects to LiveKit SIP, spins up a Realtime API session as Sophia.
+
+Architecture mirrors kirklandsig/AIReceptionist (AGPL-3.0) adapted for
+full appointment-booking functionality.
 """
 
-import asyncio
 import logging
 import os
 
 from dotenv import load_dotenv
-from livekit import agents
-from livekit.agents import AgentSession, JobContext, WorkerOptions, cli
+from livekit.agents import JobContext, WorkerOptions, cli
 from livekit.plugins import openai as lk_openai
-from livekit.plugins import silero
+from livekit.plugins import noise_cancellation
 
 from dental_agent import DentalAgent
 from config_loader import load_clinic_config
@@ -26,19 +27,26 @@ CLINIC_CONFIG_PATH = os.getenv("CLINIC_CONFIG_PATH", "config/businesses/dental-c
 async def entrypoint(ctx: JobContext) -> None:
     """Called once per incoming (or outgoing) SIP call."""
     config = load_clinic_config(CLINIC_CONFIG_PATH)
+    clinic_name = config["clinic"]["name"]
 
-    logger.info("New call — room: %s | config: %s", ctx.room.name, config["clinic"]["name"])
+    logger.info("New call — room: %s | clinic: %s", ctx.room.name, clinic_name)
+
+    # SIP calls get telephony-optimised noise cancellation;
+    # non-SIP (browser/dev) get the standard model.
+    is_sip = ctx.room.name.startswith("sip-") or "sip" in ctx.job.metadata.lower()
+    nc = (
+        noise_cancellation.BVC()
+        if is_sip
+        else noise_cancellation.BVC()
+    )
 
     await ctx.connect()
-
-    # Voice Activity Detection
-    vad = silero.VAD.load()
 
     # OpenAI Realtime model — shimmer voice, low temperature for consistency
     realtime_model = lk_openai.realtime.RealtimeModel(
         model="gpt-4o-realtime-preview",
-        voice=config["agent"]["voice"],          # shimmer
-        temperature=config["agent"]["temperature"],  # 0.6
+        voice=config["agent"]["voice"],           # shimmer
+        temperature=config["agent"]["temperature"],   # 0.6
         instructions=_build_system_prompt(config),
         turn_detection=lk_openai.realtime.ServerVadOptions(
             threshold=0.5,
@@ -47,20 +55,8 @@ async def entrypoint(ctx: JobContext) -> None:
         ),
     )
 
-    dental_agent = DentalAgent(config=config)
-
-    session = AgentSession(
-        vad=vad,
-        llm=realtime_model,
-    )
-
-    # Register all function-calling tools onto the session
-    dental_agent.register_tools(session)
-
-    await session.start(
-        room=ctx.room,
-        agent=dental_agent,
-    )
+    dental_agent = DentalAgent(config=config, realtime_model=realtime_model, nc=nc)
+    await dental_agent.start(ctx)
 
 
 def _build_system_prompt(config: dict) -> str:
@@ -73,10 +69,10 @@ def _build_system_prompt(config: dict) -> str:
         f"  - {day}: {times}" for day, times in hours.items()
     )
     faq_lines = "\n".join(
-        f"  - {k}: {v}" for k, v in faq.items()
+        f"  Q: {k}\n  A: {v}" for k, v in faq.items()
     )
 
-    return f"""
+    return f"""\
 {agent_cfg['personality']}
 
 CLINIC DETAILS:
@@ -94,16 +90,16 @@ FREQUENTLY ASKED QUESTIONS:
 BOOKING RULES:
   - Appointments are 60 minutes by default.
   - ALWAYS call the check_available_slots tool before offering time slots.
-  - ALWAYS confirm the patient's name, email address, and chosen slot before booking.
+  - ALWAYS confirm the patient's full name, email address, and chosen slot before booking.
   - NEVER invent available times — only offer slots returned by the calendar tool.
   - If you cannot help the caller, offer to have a human call them back.
 
 CONVERSATION STYLE:
   - Speak slowly and clearly — this is a medical context.
   - Be warm, calm, and reassuring at all times.
-  - Confirm important details back to the patient before acting.
-  - End every call warmly by name.
-""".strip()
+  - Confirm important details back to the patient before taking any action.
+  - End every call warmly, addressing the patient by their first name.
+"""
 
 
 if __name__ == "__main__":
