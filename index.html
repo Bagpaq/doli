@@ -54,6 +54,18 @@ input,textarea{font-family:inherit}
 .chip.shard .num{color:var(--mint2)}
 .chip.pulse{animation:chipPulse .5s ease}
 @keyframes chipPulse{40%{transform:scale(1.12);box-shadow:0 0 14px rgba(61,240,184,.6)}}
+.chip.buff{border-color:var(--gold);animation:glowPulse 1.2s infinite}
+.chip.buff .num{color:var(--gold2)}
+
+/* Golden Candle — rare tappable flying bonus */
+.goldCandle{position:absolute;z-index:65;width:54px;height:54px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:1.7rem;cursor:pointer;
+  background:radial-gradient(circle at 35% 30%,#fff3c4,#f5b93a 70%,#c78a12);
+  border:2px solid #ffe9a8;box-shadow:0 0 18px rgba(255,215,94,.9);
+  animation:candleFly 9s linear forwards}
+.goldCandle i{font-style:normal;animation:candleBob 1.1s ease-in-out infinite;display:block}
+@keyframes candleFly{from{left:-60px}to{left:calc(100% + 10px)}}
+@keyframes candleBob{50%{transform:translateY(-12px) rotate(9deg)}}
 #settingsBtn{margin-left:auto;font-size:1.25rem;width:36px;height:36px;border-radius:12px;
   background:rgba(255,255,255,.07);border:1px solid var(--line);transition:transform .2s}
 #settingsBtn:active{transform:rotate(90deg) scale(.9)}
@@ -137,7 +149,7 @@ input,textarea{font-family:inherit}
 .dot.g{background:var(--mint);color:var(--mint)}
 .dot.y{background:var(--gold);color:var(--gold)}
 .dot.r{background:var(--red);color:var(--red);animation:glowPulse 1s infinite}
-.stName{width:66px;color:var(--dim);font-weight:700;white-space:nowrap}
+.stName{width:70px;color:var(--dim);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 0 auto}
 .stLv{width:34px;font-weight:800}
 .stUp{margin-left:auto;font-size:.62rem;padding:2px 8px;border-radius:9px;font-weight:900;
   background:linear-gradient(180deg,#3f4a9e,#2c3480);border:1px solid rgba(255,255,255,.14);white-space:nowrap}
@@ -333,7 +345,7 @@ input,textarea{font-family:inherit}
   .rigArtWrap{width:64px}.rigArt{width:60px;height:50px}
   .tapBtn{width:56px;height:56px}
   .buyBtn{width:76px}
-  .stName{width:56px}
+  .stName{width:62px;font-size:.62rem}
 }
 @media (min-width:700px){
   .achGrid{grid-template-columns:repeat(auto-fill,minmax(50px,1fr))}
@@ -348,6 +360,7 @@ input,textarea{font-family:inherit}
       <span class="chip dh" id="chipDH" title="Diamond Hands (prestige)"><span class="ico">💎🙌</span><span class="num" id="hudDHV">0</span></span>
       <span class="chip gem" id="chipGem" title="Gems"><span class="ico">💠</span><span class="num" id="hudGemV">0</span></span>
       <span class="chip shard" id="chipShard" title="Research Shards"><span class="ico">🔬</span><span class="num" id="hudShardV">0</span></span>
+      <span class="chip buff" id="chipBuff" style="display:none" title="Active boost"><span class="ico">🚀</span><span class="num" id="hudBuffV"></span></span>
       <button id="settingsBtn" title="Settings">⚙️</button>
     </div>
     <div id="energyRow">
@@ -1158,6 +1171,7 @@ const TICK=0.1;
 let lastFrame=performance.now(), acc=0;
 
 function tick(dt){
+  g.playSec=(g.playSec||0)+dt;
   // Energy regen (never above cap; reward overfills stay until spent)
   if(g.energy<energyCap())g.energy=Math.min(energyCap(),g.energy+energyRegen()*dt);
 
@@ -1659,6 +1673,41 @@ function updateHUD(dt){
   $('energyBar').style.width=pct+'%';
   $('energyTxt').textContent='⚡ '+Math.floor(hudDisp.energy)+' / '+cap;
   $('energyRegen').textContent='+'+energyRegen().toFixed(1)+'/s';
+  // live boost chip — active multipliers are always visible
+  const now=Date.now(),bs=g.buffs.filter(b=>b.until>now);
+  if(bs.length){
+    const best=bs.reduce((a,b)=>b.mult>a.mult?b:a);
+    $('chipBuff').style.display='inline-flex';
+    $('hudBuffV').textContent='×'+best.mult+' · '+Math.ceil((best.until-now)/1000)+'s'+(bs.length>1?' +'+(bs.length-1):'');
+  }else $('chipBuff').style.display='none';
+}
+
+/* ---------- Golden Candle: rare tappable flying bonus ---------- */
+let candleNext=Date.now()+60e3+Math.random()*90e3;
+function maybeCandle(){
+  if(Date.now()<candleNext||document.hidden||document.querySelector('.goldCandle'))return;
+  candleNext=Date.now()+150e3+Math.random()*210e3;
+  const el=document.createElement('div');
+  el.className='goldCandle';el.innerHTML='<i>📈</i>';
+  el.style.top=(16+Math.random()*44)+'%';
+  el.addEventListener('pointerdown',e=>{
+    e.stopPropagation();el.remove();
+    const roll=Math.random();
+    if(roll<0.5){
+      g.buffs.push({c:0,r:null,mult:7,until:Date.now()+30000,name:'GOLDEN CANDLE'});
+      toast('📈 GOLDEN CANDLE! ×7 ALL profit for 30s!');
+    }else if(roll<0.8){
+      const bonus=Math.round(energyCap()*0.25);
+      g.energy+=bonus;
+      toast('📈 Golden Candle pops! +'+bonus+' ⚡');
+    }else{
+      g.gems+=3;
+      toast('📈 Golden Candle pops! +3 💠');
+    }
+    sfxPrestige();confettiBig();queueSave();
+  },{once:true});
+  setTimeout(()=>el.remove(),9300);
+  $('app').appendChild(el);
 }
 
 /* ============================================================
@@ -2323,6 +2372,7 @@ function openSettings(){
   <div class="setRow"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="muteAll" ${g.settings.muted?'checked':''}> Mute everything</label></div>
   <hr style="border-color:var(--line);margin:8px 0">
   <div class="setRow" style="font-size:.75rem;color:var(--dim)">💾 Autosaves every 10s + on every purchase. Offline cap: ${offlineCapH()}h (extend in the Lab).</div>
+  <div class="setRow" style="font-size:.75rem;color:var(--dim)">📊 Playtime ${fmtTime(g.playSec||0)} · ${fmtInt(g.tapsTotal)} taps · ${fmt(g.chains[0].lifetime)} ₿M lifetime · prestiged ${g.chains[0].prestiges}×</div>
   <div class="setRow"><button class="btn blue" style="flex:1" id="expBtn">📤 Export save</button>
   <button class="btn blue" style="flex:1" id="impBtn">📥 Import save</button></div>
   <textarea class="ioArea" id="ioArea" placeholder="Export puts your save here — copy it somewhere safe. Paste a save here and hit Import to restore."></textarea>
@@ -2425,7 +2475,7 @@ function frame(){
   }
   badgeAcc+=rdt;
   if(badgeAcc>=1){
-    badgeAcc=0;updateBadges();
+    badgeAcc=0;updateBadges();maybeCandle();
     if(ui.screen==='chains')buildChains();          // keep unlock progress live
     if(ui.screen==='lab'&&ui.dirty.lab)buildScreen('lab');
   }
