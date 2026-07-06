@@ -30,8 +30,14 @@ was closed.
 | Collectible Operator **skins** with stat bonuses (Mystery Wallet gacha, gems earned in-game only) | AdCap outfits | no real-money anything |
 | Golden Candle 📈 | AdCap golden angel | rare flying tap bonus: ×7 boost, energy, or gems |
 
-Chains 2–5 (StakeShiba, MoonOre, NeoYen, QuantumCoin) are visible on the
-Chains tab with live unlock progress, shipped as locked coming-soon economies.
+**Two fully playable Chains**: Genesis (BitMiko ₿M) from the start, and
+**Layer2 (StakeShiba STK)** — a complete second economy with its own 10
+staking rigs, its own 10-operator roster (Shiba-chan, Puddle-kun, MEV
+Phantom…), its own Diamond Hands pool and prestige loop — unlocking at 100T
+₿M Genesis lifetime earnings, with one-tap chain switching. Both draw from
+the same shared ⚡ Energy pool, so every session is an allocation puzzle.
+Chains 3–5 (MoonOre, NeoYen, QuantumCoin) are visible with live unlock
+progress as coming-soon economies.
 
 ## 💾 Saves
 

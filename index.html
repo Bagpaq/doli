@@ -356,7 +356,7 @@ input,textarea{font-family:inherit}
 <div id="app">
   <header id="hud">
     <div id="hudTop">
-      <span class="chip coin" id="chipCoin"><span class="ico">🪙</span><span class="num" id="hudCoinV">0</span>&nbsp;<span id="hudCoinSym" style="font-size:.7rem;color:var(--dim)">₿M</span></span>
+      <span class="chip coin" id="chipCoin"><span class="ico" id="hudCoinIco">🪙</span><span class="num" id="hudCoinV">0</span>&nbsp;<span id="hudCoinSym" style="font-size:.7rem;color:var(--dim)">₿M</span></span>
       <span class="chip dh" id="chipDH" title="Diamond Hands (prestige)"><span class="ico">💎🙌</span><span class="num" id="hudDHV">0</span></span>
       <span class="chip gem" id="chipGem" title="Gems"><span class="ico">💠</span><span class="num" id="hudGemV">0</span></span>
       <span class="chip shard" id="chipShard" title="Research Shards"><span class="ico">🔬</span><span class="num" id="hudShardV">0</span></span>
@@ -509,8 +509,20 @@ const CHAINS=[
    {name:'Dyson Node',        ico:'dyson',    p:1e9,   cyc:768, e:26000},
   ]},
  {id:'layer2',name:'Layer2 Chain',ico:'🌙',coin:'StakeShiba',sym:'STK',coinIco:'🐕',K:5e9,
-  desc:'Staking pools under a neon moon. Validator Nodes, Delegation Pools, Liquidity Vaults…',
-  unlockDesc:'Reach 100T ₿M lifetime earnings on Genesis Chain',unlockLife:new D(1,14),rigs:[]},
+  desc:'Staking pools under a neon moon. Slower cycles, monstrous payouts.',
+  unlockDesc:'Reach 100T ₿M lifetime earnings on Genesis Chain',unlockLife:new D(1,14),
+  rigs:[
+   {name:'Validator Node',    ico:'rack',   p:100,   cyc:4,    e:30},
+   {name:'Delegation Pool',   ico:'sub',    p:1200,  cyc:8,    e:100},
+   {name:'Liquidity Vault',   ico:'box',    p:12e3,  cyc:16,   e:300},
+   {name:'Yield Garden',      ico:'solar',  p:1.1e5, cyc:32,   e:800},
+   {name:'Restake Reactor',   ico:'chip',   p:1e6,   cyc:64,   e:2000},
+   {name:'Slashing Shield',   ico:'gpu',    p:9e6,   cyc:128,  e:5000},
+   {name:'Governance Citadel',ico:'volcano',p:8e7,   cyc:256,  e:12000},
+   {name:'Cross-Chain Bridge',ico:'sat',    p:7e8,   cyc:512,  e:25000},
+   {name:'MEV Lighthouse',    ico:'laptop', p:6e9,   cyc:1024, e:50000},
+   {name:'Shiba Singularity', ico:'dyson',  p:5e10,  cyc:2048, e:100000},
+  ]},
  {id:'moonore',name:'MoonOre Chain',ico:'🪨',coin:'MoonOre',sym:'MOR',coinIco:'🌑',K:5e12,
   desc:'NFT-mining hybrid rigs chiselling collectible ore from lunar regolith.',
   unlockDesc:'Reach 10Qa ₿M lifetime earnings on Genesis Chain',unlockLife:new D(1,16),rigs:[]},
@@ -589,6 +601,50 @@ const MGRS=[
   abil:{name:'Genesis Blessing',mult:3,dur:20,cd:300,global:true,txt:'x3 ALL rigs for 20s'},
   art:{hair:'hood',hc:'#b48cff',cc:'#232a6e',acc:'crown',mouth:'flat'}},
 ];
+/* Layer2 (StakeShiba) roster — same rules, new faces */
+const MGRS_L2=[
+ {name:'Shiba-chan',rar:'common',cost:0,free:true,
+  desc:'A shiba girl who guards her Validator Node like it is a very important stick.',
+  abil:{name:'Awoo Uptime',mult:3,dur:30,cd:120,txt:'x3 Validator Node for 30s'},
+  art:{hair:'ears',hc:'#e8b268',cc:'#ff9d6f',acc:'none',mouth:'cat'}},
+ {name:'Puddle-kun',rar:'common',cost:4e4,
+  desc:'Made of 100% liquidity. Do not leave him near a heater or an exploit.',
+  abil:{name:'Deep Liquidity',mult:3,dur:30,cd:150,txt:'x3 Delegation Pool for 30s'},
+  art:{hair:'bob',hc:'#8fd3ff',cc:'#6fa8ff',acc:'float',mouth:'smile'}},
+ {name:'Yield-yousei',rar:'common',cost:4e5,
+  desc:'A tiny garden fairy who waters APY sprouts every morning. Compounding is her cardio.',
+  abil:{name:'Compound Bloom',mult:4,dur:30,cd:180,txt:'x4 Liquidity Vault for 30s'},
+  art:{hair:'long',hc:'#8affc9',cc:'#3df0b8',acc:'petal',mouth:'smile'}},
+ {name:'Barista Botto',rar:'rare',cost:5e6,
+  desc:'Serves triple-shot restaked lattes. The Yield Garden runs entirely on foam art.',
+  abil:{name:'Espresso Epoch',mult:5,dur:30,cd:210,txt:'x5 Yield Garden for 30s'},
+  art:{hair:'bot',hc:'#c9b39a',cc:'#8a6f4d',acc:'headset',mouth:'v'}},
+ {name:'Guardian Gao',rar:'rare',cost:6e7,
+  desc:'Once ate a slashing penalty and simply refused to be slashed. The Reactor purrs for him.',
+  abil:{name:'Iron Restake',mult:5,dur:30,cd:240,txt:'x5 Restake Reactor for 30s'},
+  art:{hair:'spiky',hc:'#ff8d6f',cc:'#ff7a8a',acc:'helmet',mouth:'flat'}},
+ {name:'Parry-nyan',rar:'rare',cost:8e8,
+  desc:'Deflects slashings with a paw. Claims it is "just reflexes". It is definitely magic.',
+  abil:{name:'Purrfect Block',mult:6,dur:30,cd:270,txt:'x6 Slashing Shield for 30s'},
+  art:{hair:'ears',hc:'#cfd8ff',cc:'#b48cff',acc:'wrench',mouth:'cat'}},
+ {name:'Vote-hime',rar:'epic',cost:1e10,
+  desc:'Every proposal passes when she smiles. Quorum assembles out of sheer devotion.',
+  abil:{name:'Royal Quorum',mult:7,dur:30,cd:300,txt:'x7 Governance Citadel for 30s'},
+  art:{hair:'long',hc:'#ffca6b',cc:'#ffd75e',acc:'crown',mouth:'smile'}},
+ {name:'MEV Phantom',rar:'epic',cost:1.5e11,
+  desc:'Arrives before your transaction does. Nobody knows how. The bridge tolls pay tribute.',
+  abil:{name:'Sandwich Hour',mult:8,dur:30,cd:300,txt:'x8 Cross-Chain Bridge for 30s'},
+  art:{hair:'hood',hc:'#20264f',cc:'#4a4f88',acc:'visor',mouth:'flat'}},
+ {name:'Shiba Shogun',rar:'legendary',cost:2e12,
+  desc:'Commands the MEV Lighthouse fleet with a single dignified bork.',
+  abil:{name:'Bork of War',mult:2,dur:20,cd:300,global:true,txt:'x2 ALL rigs for 20s'},
+  art:{hair:'ears',hc:'#e8b268',cc:'#232a6e',acc:'helmet',mouth:'v'}},
+ {name:'Staked God-sama',rar:'mythic',cost:3e13,
+  desc:'Delegated themselves to themselves at the beginning of time. APY: yes.',
+  abil:{name:'Singularity Yield',mult:3,dur:20,cd:300,global:true,txt:'x3 ALL rigs for 20s'},
+  art:{hair:'hood',hc:'#ffd75e',cc:'#3c1f6e',acc:'crown',mouth:'sleepy'}},
+];
+function mgrDef(c,i){return c===1?MGRS_L2[i]:MGRS[i];}
 
 /* ============================================================
    SECTION: GAME DATA — SKINS (collectible + small stat bonus)
@@ -644,8 +700,8 @@ const LAB_BRANCHES=[
    Spending Diamond Hands reduces your banked bonus — real choice.
    ============================================================ */
 const DH_SHOP=[
- {id:'headstart',name:'HODL Head Start',ico:'🚀',desc:'Start every run with 10 free Cracked Laptops',cost:5,max:1},
- {id:'pickaxe',name:'Golden Pickaxe',ico:'⛏️',desc:'+25% Genesis profit permanently (stacks)',cost:3,scale:2,max:99},
+ {id:'headstart',name:'HODL Head Start',ico:'🚀',desc:'Start every run on this Chain with 10 free first-rig levels',cost:5,max:1},
+ {id:'pickaxe',name:'Golden Pickaxe',ico:'⛏️',desc:'+25% profit on this Chain permanently (stacks)',cost:3,scale:2,max:99},
  {id:'battery',name:'Diamond Battery',ico:'🔋',desc:'+250 max ⚡ Energy (stacks)',cost:4,scale:2,max:99},
  {id:'regen',name:'Turbo Regen',ico:'♻️',desc:'+0.5 ⚡/s Energy regen (stacks)',cost:4,scale:2,max:99},
  {id:'magnet',name:'Whale Magnet',ico:'🧲',desc:'+10% Diamond Hands gained on prestige (stacks)',cost:10,scale:2,max:10},
@@ -831,6 +887,7 @@ function freshState(){
     dailyClaimed:{},msClaimed:{},achDone:{},
     buffs:[],cooldowns:{},
     chains:[newChainState(0),null,null,null,null],
+    active:0,
     event:{id:-1,cur:0,rig:0,claimed:{},pump:null,pumpCd:0},
     sprint:{endsAt:0,cdUntil:0,base:0,startLife:null,best:0,runs:0},
     seenWelcome:false,
@@ -905,9 +962,10 @@ function importSave(str){
    ============================================================ */
 function researchSum(field){let v=0;for(const r of RESEARCH)if(g.research[r.id]&&r[field])v+=r[field];return v;}
 function researchMax(field){let v=0;for(const r of RESEARCH)if(g.research[r.id]&&r[field])v=Math.max(v,r[field]);return v;}
-function dhShopLvl(id){return g.chains[0].dhShop[id]||0;}
-function energyCap(){return 150+researchSum('cap')+dhShopLvl('battery')*250;}
-function energyRegen(){return 1+researchSum('regen')+dhShopLvl('regen')*0.5;}
+function dhShopLvlC(c,id){const ch=g.chains[c];return (ch&&ch.dhShop[id])||0;}
+function dhShopSum(id){let v=0;for(const ch of g.chains)if(ch)v+=ch.dhShop[id]||0;return v;}
+function energyCap(){return 150+researchSum('cap')+dhShopSum('battery')*250;}
+function energyRegen(){return 1+researchSum('regen')+dhShopSum('regen')*0.5;}
 function offlineCapH(){return Math.max(2,researchMax('off'));}
 function cdrMult(){return Math.max(0.3,1-Math.min(0.6,researchSum('cdr')));}
 function buffDurMult(){return 1+researchSum('dur');}
@@ -921,16 +979,17 @@ function rigBuffMult(c,r){
   for(const b of g.buffs)if(b.c===c&&b.r===r&&b.until>now)m*=b.mult;
   return m;
 }
-function skinBonus(mgrIdx){
+function skinBonus(c,i){
+  if(c!==0)return 0;
   let b=0;
-  for(const sk of SKINS)if(g.skins[sk.id]&&sk.mgr===mgrIdx)b+=sk.bonus;
+  for(const sk of SKINS)if(g.skins[sk.id]&&sk.mgr===i)b+=sk.bonus;
   return b;
 }
 function chainMult(c){
   const ch=g.chains[c];
   return (1+0.02*ch.dh)                       // Diamond Hands: +2% each, forever
        * (1+researchSum('profit'))            // Blockchain Lab
-       * Math.pow(1.25,dhShopLvl('pickaxe'))  // Golden Pickaxe stacks
+       * Math.pow(1.25,dhShopLvlC(c,'pickaxe'))  // Golden Pickaxe stacks
        * globalBuffMult();                    // Whale Splash / Pump buffs
 }
 
@@ -946,7 +1005,7 @@ function bwF(r){return 1+0.08*r.bw;}
 function cycleTime(c,i){const r=g.chains[c].rigs[i];return Math.max(CYCLE_FLOOR,rigDef(c,i).cyc/bwF(r));}
 function rigBaseFactor(c,i){ // shared factor for profit & wallet cap
   const r=g.chains[c].rigs[i];
-  return D.from(rigDef(c,i).p).mul(r.cnt).mul(msMult(r.cnt)).mul(chainMult(c)).mul(1+skinBonus(i)).mul(rigBuffMult(c,i));
+  return D.from(rigDef(c,i).p).mul(r.cnt).mul(msMult(r.cnt)).mul(chainMult(c)).mul(1+skinBonus(c,i)).mul(rigBuffMult(c,i));
 }
 function rigCycleProfit(c,i){ // what actually pays: min(hash, wallet)
   const r=g.chains[c].rigs[i];
@@ -1051,7 +1110,7 @@ function buySub(c,i,stage){
 function hireMgr(c,i){
   const r=g.chains[c].rigs[i];
   if(r.mgr)return false;
-  const cost=D.from(MGRS[i].cost);
+  const cost=D.from(mgrDef(c,i).cost);
   if(!spendCoins(c,cost))return false;
   r.mgr=true;g.counters.hireToday++;
   queueSave();
@@ -1076,7 +1135,7 @@ function abilCdLeft(c,i){return Math.max(0,((g.cooldowns[mgrKey(c,i)]||0)-Date.n
 function useAbility(c,i){
   const r=g.chains[c].rigs[i];
   if(!r.mgr||!abilReady(c,i))return false;
-  const a=MGRS[i].abil;
+  const a=mgrDef(c,i).abil;
   const dur=a.dur*buffDurMult()*1000;
   g.buffs.push({c,r:a.global?null:i,mult:a.mult,until:Date.now()+dur,name:a.name});
   g.cooldowns[mgrKey(c,i)]=Date.now()+a.cd*cdrMult()*1000;
@@ -1090,14 +1149,14 @@ function pruneBuffs(){const now=Date.now();g.buffs=g.buffs.filter(b=>b.until>now
    SECTION: PRESTIGE — DIAMOND HANDS
    dh = sqrt(lifetime/K) − sqrt(previouslyClaimedLifetime/K)
    ============================================================ */
-function dhTotalFor(c,life){return Math.floor(life.div(CHAINS[c].K).sqrt().num()*(1+0.1*dhShopLvl('magnet')));}
+function dhTotalFor(c,life){return Math.floor(life.div(CHAINS[c].K).sqrt().num()*(1+0.1*dhShopLvlC(c,'magnet')));}
 function dhGainAvailable(c){
   const ch=g.chains[c];
   return Math.max(0,dhTotalFor(c,ch.lifetime)-ch.dhClaimed);
 }
 function nextDhAt(c){ // lifetime needed for next +1 DH
   const ch=g.chains[c];
-  const nxt=(ch.dhClaimed+dhGainAvailable(c)+1)/(1+0.1*dhShopLvl('magnet'));
+  const nxt=(ch.dhClaimed+dhGainAvailable(c)+1)/(1+0.1*dhShopLvlC(c,'magnet'));
   return D.from(nxt).mul(nxt).mul(CHAINS[c].K);
 }
 function doPrestige(c){
@@ -1110,7 +1169,7 @@ function doPrestige(c){
   ch.coins=D0();
   ch.rigs=CHAINS[c].rigs.map(()=>newRig());
   // wiped: rig levels, managers, accountants. kept: dh, research, skins, achievements.
-  ch.rigs[0].cnt=1+(c===0?dhShopLvl('headstart')*10:0);
+  ch.rigs[0].cnt=1+dhShopLvlC(c,'headstart')*10;
   ch.rigs[0].mgr=true; // Miko-chan is forever your friend
   ch.rigs[0].prog=CHAINS[c].rigs[0].cyc;
   g.buffs=g.buffs.filter(b=>b.c!==c);
@@ -1118,9 +1177,9 @@ function doPrestige(c){
   save();
   return gain;
 }
-function buyDhShop(id){
-  const item=DH_SHOP.find(x=>x.id===id), ch=g.chains[0];
-  const lvl=dhShopLvl(id);
+function buyDhShop(c,id){
+  const item=DH_SHOP.find(x=>x.id===id), ch=g.chains[c];
+  const lvl=dhShopLvlC(c,id);
   if(lvl>=(item.max||99))return false;
   const cost=Math.ceil(item.cost*Math.pow(item.scale||1,lvl));
   if(ch.dh<cost)return false;
@@ -1210,6 +1269,18 @@ function tick(dt){
   if(g.event.pump)resolvePump();
   checkAchievements(dt);
 
+  // Layer2 unlock — a whole new parallel economy goes live
+  if(!g.chains[1]&&CHAINS[1].rigs.length&&g.chains[0].lifetime.gte(CHAINS[1].unlockLife)){
+    g.chains[1]=newChainState(1);
+    g.chains[1].rigs[0].cnt=1;
+    g.chains[1].rigs[0].mgr=true; // Shiba-chan comes free, same as Miko-chan
+    g.chains[1].rigs[0].prog=CHAINS[1].rigs[0].cyc;
+    toast('🌙 LAYER2 CHAIN UNLOCKED! Switch over from the Chains tab!');
+    confettiBig();sfxPrestige();
+    ui.dirty.chains=true;
+    queueSave();
+  }
+
   // autosave every 10s + when flagged dirty (min 1.5s apart)
   saveTimer+=dt;
   if(saveTimer>=10||(dirtySave&&saveTimer>=1.5)){saveTimer=0;save();}
@@ -1219,7 +1290,7 @@ function tick(dt){
 let lastFloat={};
 function onPayout(c,i,pay,n){
   const now=performance.now();
-  if(ui.screen==='miners'&&rigEls[i]&&(!lastFloat[i]||now-lastFloat[i]>900)){
+  if(c===act()&&ui.screen==='miners'&&rigEls[i]&&(!lastFloat[i]||now-lastFloat[i]>900)){
     lastFloat[i]=now;
     bounceOp(i);
   }
@@ -1631,10 +1702,13 @@ const ui={screen:'miners',dirty:{miners:true,ops:true,tasks:true,lab:true,presti
 let rigEls=[],opEls=[],taskEls={},prestigeEls={},eventEls={},hudDisp={coin:D0(),energy:0};
 
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-function mgrArt(i){
-  const eq=g.equip[i];
-  if(eq&&g.skins[eq]){const sk=SKINS.find(s=>s.id===eq);if(sk)return {...MGRS[i].art,...sk.art};}
-  return MGRS[i].art;
+function act(){return g.chains[g.active]?g.active:0;}
+function mgrArt(c,i){
+  if(c===0){ // skins are a Genesis-roster collection
+    const eq=g.equip[i];
+    if(eq&&g.skins[eq]){const sk=SKINS.find(s=>s.id===eq);if(sk)return {...MGRS[i].art,...sk.art};}
+  }
+  return mgrDef(c,i).art;
 }
 function bounceOp(i){
   const el=rigEls[i]&&rigEls[i].opChibi;
@@ -1659,7 +1733,9 @@ document.querySelectorAll('.navBtn').forEach(b=>b.addEventListener('click',()=>g
 
 /* ---------- HUD ---------- */
 function updateHUD(dt){
-  const ch=g.chains[0];
+  const a=act(),ch=g.chains[a];
+  $('hudCoinSym').textContent=CHAINS[a].sym;
+  $('hudCoinIco').textContent=CHAINS[a].coinIco;
   // count-up tween — numbers never jump-cut
   const diff=ch.coins.sub(hudDisp.coin);
   hudDisp.coin=diff.m<0?ch.coins:hudDisp.coin.add(diff.mul(Math.min(1,dt*7)));
@@ -1714,24 +1790,25 @@ function maybeCandle(){
    MINERS SCREEN
    ============================================================ */
 function buildMiners(){
-  const el=$('screen-miners'),ch=g.chains[0],rigs=ch.rigs;
+  const c=act(),el=$('screen-miners'),ch=g.chains[c],rigs=ch.rigs,C=CHAINS[c];
   rigEls=[];
   let firstLocked=rigs.findIndex(r=>r.cnt===0);
   if(firstLocked===-1)firstLocked=rigs.length;
-  let html=`<div class="screenTitle">${CHAINS[0].ico} ${CHAINS[0].name} <small id="chainRate"></small></div>
+  const swap=g.chains[1]?`<button class="amtBtn" id="chainSwap" style="flex:0 0 auto;margin-left:auto;padding:4px 10px">🔁 switch</button>`:'';
+  let html=`<div class="screenTitle">${C.ico} ${C.name} <small id="chainRate"></small>${swap}</div>
   <div id="buyAmtRow">
     <span style="font-size:.68rem;color:var(--dim);font-weight:800">BUY</span>
     ${['1','10','25','max'].map(a=>`<button class="amtBtn ${g.buyAmt===a?'sel':''}" data-amt="${a}">${a==='max'?'MAX':'x'+a}</button>`).join('')}
   </div>`;
   const showN=Math.min(rigs.length,firstLocked+1);
   for(let i=0;i<showN;i++){
-    const def=CHAINS[0].rigs[i],r=rigs[i];
+    const def=C.rigs[i],r=rigs[i];
     if(r.cnt===0){
       html+=`<div class="card rigLocked" data-i="${i}">
         <div class="rigArt">${rigSVG(def.ico)}</div>
         <div style="flex:1;min-width:0"><div class="rigName">${def.name}</div>
         <div class="sub" style="margin:2px 0 0">New mining frontier awaits…</div></div>
-        <button class="btn mint buyBtn unlockBtn" data-i="${i}">UNLOCK<span class="cost">⚡ ${fmtInt(rigUnitCost(0,i,0))}</span></button>
+        <button class="btn mint buyBtn unlockBtn" data-i="${i}">UNLOCK<span class="cost">⚡ ${fmtInt(rigUnitCost(c,i,0))}</span></button>
       </div>`;
     }else{
       html+=`<div class="card rig" data-i="${i}">
@@ -1761,17 +1838,23 @@ function buildMiners(){
   if(showN<rigs.length)html+=`<div class="card" style="text-align:center;color:var(--dim);font-size:.78rem">🔒 ${rigs.length-showN} more rigs await deeper in the chain…</div>`;
   el.innerHTML=html;
 
-  el.querySelectorAll('.amtBtn').forEach(b=>b.addEventListener('click',()=>{
+  el.querySelectorAll('.amtBtn[data-amt]').forEach(b=>b.addEventListener('click',()=>{
     g.buyAmt=b.dataset.amt;queueSave();
-    el.querySelectorAll('.amtBtn').forEach(x=>x.classList.toggle('sel',x.dataset.amt===g.buyAmt));
+    el.querySelectorAll('.amtBtn[data-amt]').forEach(x=>x.classList.toggle('sel',x.dataset.amt===g.buyAmt));
   }));
+  const sw=$('chainSwap');
+  if(sw)sw.addEventListener('click',()=>{
+    let n=g.active;
+    do{n=(n+1)%CHAINS.length;}while(!g.chains[n]);
+    switchChain(n);
+  });
   el.querySelectorAll('.card[data-i]').forEach(card=>{
     const i=+card.dataset.i,r=rigs[i];
     if(r.cnt===0){
       card.querySelector('.unlockBtn').addEventListener('click',e=>{
         const saved=g.buyAmt;g.buyAmt='1';
-        const res=buyRig(0,i);g.buyAmt=saved;
-        if(res){sfxBuy();toast('🔓 '+CHAINS[0].rigs[i].name+' unlocked!');ui.dirty.miners=true;buildScreen('miners',true);ui.dirty.ops=true;}
+        const res=buyRig(c,i);g.buyAmt=saved;
+        if(res){sfxBuy();toast('🔓 '+C.rigs[i].name+' unlocked!');ui.dirty.miners=true;buildScreen('miners',true);ui.dirty.ops=true;}
         else shakeBtn(e.currentTarget);
       });
       return;
@@ -1788,42 +1871,42 @@ function buildMiners(){
       E.lvs[k]=card.querySelector(`[data-lv=${k}]`);
       E.ups[k]=card.querySelector(`[data-st=${k}]`);
       E.ups[k].addEventListener('click',e=>{
-        if(buySub(0,i,k))sfxBuy();else shakeBtn(e.currentTarget);
+        if(buySub(c,i,k))sfxBuy();else shakeBtn(e.currentTarget);
       });
     });
-    E.tap.addEventListener('pointerdown',e=>{e.preventDefault();tapRig(0,i,e.clientX,e.clientY);});
+    E.tap.addEventListener('pointerdown',e=>{e.preventDefault();tapRig(c,i,e.clientX,e.clientY);});
     E.buy.addEventListener('click',e=>{
       const before=msMult(r.cnt);
-      const res=buyRig(0,i);
+      const res=buyRig(c,i);
       if(res){
         sfxBuy();
         const after=msMult(r.cnt);
         if(after>before){
           sfxMilestone();confettiBig();
-          toast('🎉 MILESTONE! '+CHAINS[0].rigs[i].name+' ×'+(after/before)+' profit!');
+          toast('🎉 MILESTONE! '+C.rigs[i].name+' ×'+(after/before)+' profit!');
         }
         if(res.k&&rigs[i].cnt===res.k){}
       } else shakeBtn(e.currentTarget);
     });
     E.abil.addEventListener('click',()=>{
-      if(useAbility(0,i)){
+      if(useAbility(c,i)){
         sfxAbility();
         const c2=E.op.querySelector('.chibi');
         if(c2){c2.classList.remove('cast');void c2.offsetWidth;c2.classList.add('cast');}
-        toast('✨ '+MGRS[i].abil.name+'! '+MGRS[i].abil.txt);
+        toast('✨ '+mgrDef(c,i).abil.name+'! '+mgrDef(c,i).abil.txt);
       }
     });
-    renderOpSlot(E,i);
+    renderOpSlot(E,c,i);
     rigEls[i]=E;
   });
   updateMiners(true);
 }
-function renderOpSlot(E,i){
-  const r=g.chains[0].rigs[i];
+function renderOpSlot(E,c,i){
+  const r=g.chains[c].rigs[i];
   if(r.mgr){
-    E.op.innerHTML=chibiSVG(mgrArt(i));
+    E.op.innerHTML=chibiSVG(mgrArt(c,i));
     E.opChibi=E.op.querySelector('.chibi');
-    E.op.title=MGRS[i].name;
+    E.op.title=mgrDef(c,i).name;
   }else{
     E.op.innerHTML=`<div class="noOp">no operator<br>💤 no idle</div>`;
     E.opChibi=null;
@@ -1833,46 +1916,48 @@ function shakeBtn(b){b.classList.remove('shake');void b.offsetWidth;b.classList.
 
 function updateMiners(force){
   if(ui.screen!=='miners'&&!force)return;
-  const rate=totalRate(0);
-  const cr=$('chainRate');if(cr)cr.textContent='+'+fmt(rate)+' '+CHAINS[0].sym+'/s';
+  const c=act();
+  const rate=totalRate(c);
+  const cr=$('chainRate');if(cr)cr.textContent='+'+fmt(rate)+' '+CHAINS[c].sym+'/s';
   rigEls.forEach(E=>{
     if(!E)return;
-    const i=E.i,r=g.chains[0].rigs[i];
+    const i=E.i,r=g.chains[c].rigs[i];
     E.cnt.textContent='× '+r.cnt;
     E.art.classList.toggle('tier1',r.cnt>=25&&r.cnt<100);
     E.art.classList.toggle('tier2',r.cnt>=100);
-    if(r.mgr){E.prof.textContent=fmt(rigRate(0,i));E.per.textContent=CHAINS[0].sym+'/sec';}
-    else{E.prof.textContent=fmt(rigCycleProfit(0,i));E.per.textContent=CHAINS[0].sym+'/cycle · '+cycleTime(0,i).toFixed(1)+'s';}
+    if(r.mgr){E.prof.textContent=fmt(rigRate(c,i));E.per.textContent=CHAINS[c].sym+'/sec';}
+    else{E.prof.textContent=fmt(rigCycleProfit(c,i));E.per.textContent=CHAINS[c].sym+'/cycle · '+cycleTime(c,i).toFixed(1)+'s';}
     const p=prevMs(r.cnt),n=nextMs(r.cnt);
     E.ms.style.width=Math.min(100,(r.cnt-p)/(n-p)*100)+'%';
     E.msl.textContent=r.cnt+' / '+n+' → ×'+(msMult(n)/msMult(r.cnt))+' profit';
-    const bn=bottleneck(0,i);
+    const bn=bottleneck(c,i);
     ['hash','bw','wal'].forEach(k=>{
       E.dots[k].className='dot '+bn.st[k];
       E.lvs[k].textContent='Lv '+r[k];
-      const cost=subCost(0,i,k);
+      const cost=subCost(c,i,k);
       E.ups[k].textContent='▲ '+fmt(cost);
-      E.ups[k].classList.toggle('can',g.chains[0].coins.gte(cost));
-      E.ups[k].classList.toggle('off',!g.chains[0].coins.gte(cost));
+      E.ups[k].classList.toggle('can',g.chains[c].coins.gte(cost));
+      E.ups[k].classList.toggle('off',!g.chains[c].coins.gte(cost));
     });
-    const k=g.buyAmt==='max'?maxAffordable(0,i):parseInt(g.buyAmt,10);
-    const kk=Math.max(1,k),cost=rigBulkCost(0,i,kk);
+    const k=g.buyAmt==='max'?maxAffordable(c,i):parseInt(g.buyAmt,10);
+    const kk=Math.max(1,k),cost=rigBulkCost(c,i,kk);
     E.buy.innerHTML='BUY ×'+kk+'<span class="cost">⚡ '+fmtInt(Math.ceil(cost))+'</span>';
     const can=g.energy>=cost&&(g.buyAmt!=='max'||k>0);
     E.buy.classList.toggle('mint',can);E.buy.classList.toggle('off',!can);
     // ability chip
     if(r.mgr){
       E.abil.style.display='flex';
-      if(abilReady(0,i)){E.abil.className='abilBtn';E.abil.textContent='✨';E.abil.title=MGRS[i].abil.name;}
-      else{E.abil.className='abilBtn cd';E.abil.textContent=Math.ceil(abilCdLeft(0,i))+'';}
+      if(abilReady(c,i)){E.abil.className='abilBtn';E.abil.textContent='✨';E.abil.title=mgrDef(c,i).abil.name;}
+      else{E.abil.className='abilBtn cd';E.abil.textContent=Math.ceil(abilCdLeft(c,i))+'';}
     }
   });
 }
 function updateRings(){
   if(ui.screen!=='miners')return;
+  const c=act();
   rigEls.forEach(E=>{
     if(!E)return;
-    const r=g.chains[0].rigs[E.i],cyc=cycleTime(0,E.i);
+    const r=g.chains[c].rigs[E.i],cyc=cycleTime(c,E.i);
     const pct=Math.min(1,r.prog/cyc)*100;
     E.tap.style.setProperty('--p',r.mgr?pct:pct);
     E.tap.classList.toggle('ready',!r.mgr&&r.prog>=cyc);
@@ -1884,20 +1969,21 @@ function updateRings(){
    OPERATORS SCREEN
    ============================================================ */
 function buildOps(){
-  const el=$('screen-ops');opEls=[];
-  let html=`<div class="screenTitle">👧 Miko Operators <small>hire to automate · tap abilities for bursts</small></div>`;
-  MGRS.forEach((m,i)=>{
-    const r=g.chains[0].rigs[i];
-    const skins=SKINS.filter(s=>s.mgr===i);
+  const c=act(),el=$('screen-ops');opEls=[];
+  const roster=c===1?MGRS_L2:MGRS;
+  let html=`<div class="screenTitle">👧 ${CHAINS[c].ico} Operators <small>hire to automate · tap abilities for bursts</small></div>`;
+  roster.forEach((m,i)=>{
+    const r=g.chains[c].rigs[i];
+    const skins=c===0?SKINS.filter(s=>s.mgr===i):[];
     html+=`<div class="card opCard" data-i="${i}">
       <div style="text-align:center">
-        <div class="opFrame rar-${m.rar}">${chibiSVG(mgrArt(i))}</div>
+        <div class="opFrame rar-${m.rar}">${chibiSVG(mgrArt(c,i))}</div>
         <div class="rarName rar-${m.rar}">${RAR_LABEL[m.rar]}</div>
       </div>
       <div class="opInfo">
         <div class="opName">${m.name}</div>
         <div class="opDesc">${m.desc}</div>
-        <div class="opDesc" style="color:var(--blue)">⛏️ Runs: ${CHAINS[0].rigs[i].name}</div>
+        <div class="opDesc" style="color:var(--blue)">⛏️ Runs: ${CHAINS[c].rigs[i].name}</div>
         <div class="opAbil">✨ ${m.abil.name} — ${m.abil.txt} <span data-el="cd" style="color:var(--dim)"></span></div>
         ${skins.length?`<div class="skinRow" data-el="skins"></div>`:''}
       </div>
@@ -1911,26 +1997,26 @@ function buildOps(){
   el.innerHTML=html;
   el.querySelectorAll('.opCard').forEach(card=>{
     const i=+card.dataset.i;
-    const E={i,card,hire:card.querySelector('[data-el=hire]'),abil:card.querySelector('[data-el=abil]'),
+    const E={i,c,card,hire:card.querySelector('[data-el=hire]'),abil:card.querySelector('[data-el=abil]'),
       acct:card.querySelector('[data-el=acct]'),cd:card.querySelector('[data-el=cd]'),
       skins:card.querySelector('[data-el=skins]'),frame:card.querySelector('.opFrame')};
     E.hire.addEventListener('click',e=>{
-      if(hireMgr(0,i)){
+      if(hireMgr(c,i)){
         sfxMilestone();confettiBig();
-        toast('🎊 '+MGRS[i].name+' joined your crew!');
+        toast('🎊 '+roster[i].name+' joined your crew!');
         ui.dirty.miners=true;buildScreen('ops',true);
       }else shakeBtn(e.currentTarget);
     });
     E.abil.addEventListener('click',e=>{
-      if(useAbility(0,i)){
+      if(useAbility(c,i)){
         sfxAbility();
         const c2=E.frame.querySelector('.chibi');
         if(c2){c2.classList.remove('cast');void c2.offsetWidth;c2.classList.add('cast');}
-        toast('✨ '+MGRS[i].abil.name+'!');
+        toast('✨ '+roster[i].abil.name+'!');
       }else shakeBtn(e.currentTarget);
     });
     E.acct.addEventListener('click',e=>{
-      if(buyAcct(0,i)){sfxPrestige();toast('🐋 '+MGRS[i].name+' is now a Whale Accountant! −10% rig costs.');buildScreen('ops',true);}
+      if(buyAcct(c,i)){sfxPrestige();toast('🐋 '+roster[i].name+' is now a Whale Accountant! −10% rig costs.');buildScreen('ops',true);}
       else shakeBtn(e.currentTarget);
     });
     if(E.skins){
@@ -1959,26 +2045,25 @@ function updateOps(force){
   if(ui.screen!=='ops'&&!force)return;
   opEls.forEach(E=>{
     if(!E)return;
-    const i=E.i,m=MGRS[i],r=g.chains[0].rigs[i];
+    const i=E.i,c=E.c,m=mgrDef(c,i),ch=g.chains[c],r=ch.rigs[i];
     if(r.mgr){
       E.hire.textContent='✓ On the job';
       E.hire.className='btn ghost';E.hire.disabled=true;
       E.abil.style.display='';E.acct.style.display='';
-      if(abilReady(0,i)){E.abil.className='btn gold';E.abil.textContent='✨ Use';E.cd.textContent='';}
-      else{E.abil.className='btn off';E.abil.textContent='⏳ '+fmtTime(abilCdLeft(0,i));E.cd.textContent='';}
+      if(abilReady(c,i)){E.abil.className='btn gold';E.abil.textContent='✨ Use';E.cd.textContent='';}
+      else{E.abil.className='btn off';E.abil.textContent='⏳ '+fmtTime(abilCdLeft(c,i));E.cd.textContent='';}
       if(r.acct){E.acct.textContent='🐋 Whale Acct ✓';E.acct.className='btn ghost';E.acct.disabled=true;}
       else{
-        E.acct.textContent='🐋 Accountant';
         E.acct.innerHTML='🐋 Accountant<span class="cost">💎🙌 '+acctCost(i)+'</span>';
-        E.acct.className='btn '+(g.chains[0].dh>=acctCost(i)?'blue':'off');
+        E.acct.className='btn '+(ch.dh>=acctCost(i)?'blue':'off');
       }
     }else{
       E.abil.style.display='none';E.acct.style.display='none';
       if(r.cnt===0){E.hire.textContent='Own the rig first';E.hire.className='btn off';}
       else if(m.free){E.hire.textContent='FREE';E.hire.className='btn mint';}
       else{
-        E.hire.innerHTML='HIRE<span class="cost">'+fmt(m.cost)+' '+CHAINS[0].sym+'</span>';
-        E.hire.className='btn '+(g.chains[0].coins.gte(D.from(m.cost))?'mint':'off');
+        E.hire.innerHTML='HIRE<span class="cost">'+fmt(m.cost)+' '+CHAINS[c].sym+'</span>';
+        E.hire.className='btn '+(ch.coins.gte(D.from(m.cost))?'mint':'off');
       }
     }
   });
@@ -2112,8 +2197,8 @@ function buildLab(){
    PRESTIGE SCREEN
    ============================================================ */
 function buildPrestige(){
-  const el=$('screen-prestige'),ch=g.chains[0];
-  let html=`<div class="screenTitle">💎🙌 Diamond Hands <small>prestige = permanent power</small></div>
+  const c=act(),el=$('screen-prestige'),ch=g.chains[c],C=CHAINS[c];
+  let html=`<div class="screenTitle">💎🙌 Diamond Hands <small>${C.ico} ${C.name}</small></div>
   <div class="card">
     <div class="dhBig"><div class="v"><span id="dhCur">${fmtInt(ch.dh)}</span> ◈</div>
     <div class="sub" style="text-align:center">each ◈ = +2% profit forever → <b style="color:var(--mint2)">+${fmtInt(ch.dh*2)}%</b> right now · prestiged ${ch.prestiges}×</div></div>
@@ -2121,11 +2206,11 @@ function buildPrestige(){
     <div class="sub" style="text-align:center" id="dhNext"></div>
     <div style="text-align:center;margin:8px 0 4px;font-weight:900;font-size:1.05rem">Claimable now: <span style="color:#c8f4ff" id="dhGain">0</span> ◈</div>
     <button class="btn pink" style="width:100%;font-size:1rem" id="prestigeBtn">🚀 HODL RESET — claim Diamond Hands</button>
-    <div class="sub" style="margin-top:8px">Resets: ₿M balance, rigs, sub-stages, Operators & Whale Accountants on this chain.<br>Keeps: ◈, Research, Skins, Achievements, other Chains. Miko-chan always comes back free 💕</div>
+    <div class="sub" style="margin-top:8px">Resets: ${C.sym} balance, rigs, sub-stages, Operators & Whale Accountants on this chain.<br>Keeps: ◈, Research, Skins, Achievements, other Chains. Your starter Operator always comes back free 💕</div>
   </div>
   <div class="card"><div class="cardTitle">🛒 Diamond Hands Shop <small style="color:var(--dim)">spending ◈ lowers your % bonus — choose wisely</small></div>
     ${DH_SHOP.map(it=>{
-      const lvl=dhShopLvl(it.id),cost=Math.ceil(it.cost*Math.pow(it.scale||1,lvl)),maxed=lvl>=(it.max||99);
+      const lvl=dhShopLvlC(c,it.id),cost=Math.ceil(it.cost*Math.pow(it.scale||1,lvl)),maxed=lvl>=(it.max||99);
       return `<div class="shopItem"><div class="shopIco">${it.ico}</div>
       <div class="shopInfo"><div class="shopName">${it.name} ${lvl?`<span class="tag new">Lv ${lvl}</span>`:''}</div>
       <div class="shopDesc">${it.desc}</div></div>
@@ -2134,32 +2219,33 @@ function buildPrestige(){
   </div>`;
   el.innerHTML=html;
   $('prestigeBtn').addEventListener('click',()=>{
-    const gain=dhGainAvailable(0);
+    const gain=dhGainAvailable(c);
     if(gain<=0){shakeBtn($('prestigeBtn'));toast('Not enough lifetime earnings yet — check the progress bar!');return;}
-    confirmPrestige(gain);
+    confirmPrestige(c,gain);
   });
   el.querySelectorAll('[data-dh]').forEach(b=>b.addEventListener('click',e=>{
-    if(buyDhShop(b.dataset.dh)){sfxBuy();toast('🛒 Purchased!');buildScreen('prestige',true);}
+    if(buyDhShop(c,b.dataset.dh)){sfxBuy();toast('🛒 Purchased!');buildScreen('prestige',true);}
     else shakeBtn(e.currentTarget);
   }));
   updatePrestige(true);
 }
 function updatePrestige(force){
   if(ui.screen!=='prestige'&&!force)return;
-  const ch=g.chains[0],gain=dhGainAvailable(0);
+  const c=act(),ch=g.chains[c],gain=dhGainAvailable(c);
   const gEl=$('dhGain');if(!gEl)return;
   gEl.textContent=fmtInt(gain);
   $('dhCur').textContent=fmtInt(ch.dh);
-  const nxt=nextDhAt(0);
-  const prevSq=Math.max(0,ch.dhClaimed+gain), prevLife=D.from(prevSq/(1+0.1*dhShopLvl('magnet'))).mul(prevSq/(1+0.1*dhShopLvl('magnet'))).mul(CHAINS[0].K);
+  const nxt=nextDhAt(c);
+  const mag=1+0.1*dhShopLvlC(c,'magnet');
+  const prevSq=Math.max(0,ch.dhClaimed+gain), prevLife=D.from(prevSq/mag).mul(prevSq/mag).mul(CHAINS[c].K);
   const span=nxt.sub(prevLife), into=ch.lifetime.sub(prevLife);
   const pct=span.isZero()?0:Math.max(0,Math.min(100,into.div(span).num()*100));
   $('dhBar').style.width=pct+'%';
-  $('dhNext').textContent='next ◈ at '+fmt(nxt)+' lifetime ₿M (now: '+fmt(ch.lifetime)+')';
+  $('dhNext').textContent='next ◈ at '+fmt(nxt)+' lifetime '+CHAINS[c].sym+' (now: '+fmt(ch.lifetime)+')';
   $('prestigeBtn').classList.toggle('off',gain<=0);
 }
-function confirmPrestige(gain){
-  const ch=g.chains[0];
+function confirmPrestige(c,gain){
+  const ch=g.chains[c];
   const gentle=gain<0.05*ch.dh;
   showModal(`<div class="modalTitle">🚀 HODL Reset?</div>
   <div style="text-align:center">${chibiSVG(MGRS[0].art)}</div>
@@ -2176,7 +2262,7 @@ function confirmPrestige(gain){
   $('mCancel').addEventListener('click',closeModal);
   $('mGo').addEventListener('click',()=>{
     closeModal();
-    const got=doPrestige(0);
+    const got=doPrestige(c);
     sfxPrestige();confettiBig();
     toast('💎🙌 +'+fmtInt(got)+' Diamond Hands! Fresh chain, bigger dreams.');
     hudDisp.coin=D0();
@@ -2334,12 +2420,14 @@ function buildChains(){
   const el=$('screen-chains');
   let html=`<div class="screenTitle">🌐 Chains <small>parallel economies, one Energy pool</small></div>`;
   CHAINS.forEach((c,idx)=>{
-    if(idx===0){
-      const ch=g.chains[0];
+    const st=g.chains[idx];
+    if(st){
+      const isAct=idx===act();
       html+=`<div class="card chainCard"><div class="chainIco">${c.ico}</div>
-      <div style="flex:1;min-width:0"><div class="cardTitle">${c.name} <span class="tag live">ACTIVE</span></div>
+      <div style="flex:1;min-width:0"><div class="cardTitle">${c.name} ${isAct?'<span class="tag live">ACTIVE</span>':'<span class="tag new">UNLOCKED</span>'}</div>
       <div class="sub" style="margin:3px 0 0">${c.desc}</div>
-      <div class="taskPct">💰 ${fmt(ch.coins)} ${c.sym} · lifetime ${fmt(ch.lifetime)} · ◈${fmtInt(ch.dh)} · prestiged ${ch.prestiges}×</div></div></div>`;
+      <div class="taskPct">💰 ${fmt(st.coins)} ${c.sym} · +${fmt(totalRate(idx))}/s · lifetime ${fmt(st.lifetime)} · ◈${fmtInt(st.dh)} · prestiged ${st.prestiges}×</div></div>
+      ${isAct?'':`<button class="btn blue" data-sw="${idx}">GO ➜</button>`}</div>`;
     }else{
       let prog='';
       if(c.unlockLife){
@@ -2355,6 +2443,16 @@ function buildChains(){
   });
   html+=`<div class="sub" style="text-align:center;margin-top:4px">New Chains launch as full parallel economies — 10 rigs, 10 Operators, their own ◈ pool — all fed by your one shared ⚡ Energy supply.</div>`;
   el.innerHTML=html;
+  el.querySelectorAll('[data-sw]').forEach(b=>b.addEventListener('click',()=>switchChain(+b.dataset.sw)));
+}
+function switchChain(idx){
+  if(!g.chains[idx]||idx===g.active)return;
+  g.active=idx;
+  hudDisp.coin=D.from(g.chains[idx].coins); // snap the tween across currencies
+  ui.dirty.miners=true;ui.dirty.ops=true;ui.dirty.prestige=true;ui.dirty.chains=true;
+  queueSave();sfxAbility();
+  toast(CHAINS[idx].ico+' Switched to '+CHAINS[idx].name);
+  go('miners');
 }
 
 /* ============================================================
@@ -2407,7 +2505,7 @@ function openSettings(){
 function showWelcome(res,elapsed){
   const capped=res.t<elapsed;
   showModal(`<div class="modalTitle">🌸 Welcome back!</div>
-  <div style="text-align:center">${chibiSVG(mgrArt(0),'happy')}</div>
+  <div style="text-align:center">${chibiSVG(mgrArt(0,0),'happy')}</div>
   <div class="modalBody" style="text-align:center">Your Operators kept mining for <b>${fmtTime(res.t)}</b>${capped?' (offline cap — extend it in the Lab!)':''}:</div>
   <div class="bigCountUp num" id="wbCount">0</div>
   ${res.perChain.map(p=>`<div class="welcomeCoin"><span>${CHAINS[p.c].coinIco} ${CHAINS[p.c].coin}</span><span class="num">+${fmt(p.sum)} ${CHAINS[p.c].sym}</span></div>`).join('')}
@@ -2427,15 +2525,15 @@ function showWelcome(res,elapsed){
    BADGES
    ============================================================ */
 function updateBadges(){
-  const ch=g.chains[0];
-  const hire=MGRS.filter((m,i)=>!ch.rigs[i].mgr&&ch.rigs[i].cnt>0&&ch.coins.gte(D.from(m.cost))).length;
+  const c=act(),ch=g.chains[c];
+  const hire=ch.rigs.filter((r,i)=>!r.mgr&&r.cnt>0&&ch.coins.gte(D.from(mgrDef(c,i).cost))).length;
   setBdg('bdgOps',hire);
   let tasks=0;
   todaysDailies().forEach(t=>{if(!g.dailyClaimed[t.id]&&t.val(g)>=t.t)tasks++;});
   MILESTONE_TASKS.forEach(t=>{try{if(!g.msClaimed[t.id]&&t.chk(g))tasks++;}catch(e){}});
   setBdg('bdgTasks',tasks);
   setBdg('bdgLab',RESEARCH.filter(canResearch).length);
-  setBdg('bdgPrestige',dhGainAvailable(0)>0?'◈':0);
+  setBdg('bdgPrestige',g.chains.some((x,ci)=>x&&dhGainAvailable(ci)>0)?'◈':0);
   const ev=eventInfo(Date.now());
   let evb=0;
   if(ev.active){EV_TRACK.forEach((t,i)=>{if(!g.event.claimed[i]&&g.event.cur>=t.at)evb++;});if(!evb&&!g.event.pump&&Date.now()>=g.event.pumpCd)evb='!';}
@@ -2492,7 +2590,7 @@ function init(){
   }else{
     setTimeout(()=>toast('🌸 Miko-chan is auto-mining your first rig — tap ⛏️ to speed things up!'),700);
   }
-  hudDisp.coin=D.from(g.chains[0].coins);
+  hudDisp.coin=D.from(g.chains[act()].coins);
   hudDisp.energy=g.energy;
   ensureEvent();
   go('miners');
