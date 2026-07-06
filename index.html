@@ -1,0 +1,2606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CryptoMiko: HODL Tycoon</title>
+<style>
+/* ============================================================
+   CRYPTOMIKO: HODL TYCOON — STYLES
+   kawaii-cyberpunk-fintech: deep indigo base, hot-pink / mint /
+   gold accents, rounded glossy everything.
+   ============================================================ */
+:root{
+  --bg1:#0f1536; --bg2:#1b2158; --bg3:#232a6e;
+  --card:rgba(34,42,96,.88); --card2:rgba(26,32,78,.92);
+  --line:rgba(255,255,255,.09);
+  --pink:#ff6fb5; --pink2:#ff9dce; --mint:#3df0b8; --mint2:#8ffce0;
+  --gold:#ffd75e; --gold2:#ffe9a8; --blue:#6fa8ff; --purple:#b48cff;
+  --red:#ff7a8a; --text:#eef2ff; --dim:#9aa6d8; --dark:#0b0f28;
+  --rar-common:#9aa3b5; --rar-rare:#58a6ff; --rar-epic:#b48cff; --rar-legendary:#ffd75e;
+  --nav-h:60px; --hud-h:96px;
+  font-size:15px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:"Trebuchet MS","Comic Sans MS","Segoe UI Rounded","Hiragino Maru Gothic ProN","Varela Round",system-ui,sans-serif;
+  color:var(--text);
+  background:radial-gradient(120% 90% at 50% -10%,var(--bg3) 0%,var(--bg2) 45%,var(--bg1) 100%) fixed;
+  user-select:none;-webkit-user-select:none;
+}
+button{font-family:inherit;color:inherit;border:none;background:none;cursor:pointer}
+input,textarea{font-family:inherit}
+.num{font-variant-numeric:tabular-nums;letter-spacing:.02em;font-weight:700}
+#app{height:100%;display:flex;flex-direction:column;max-width:760px;margin:0 auto;position:relative}
+
+/* ---------- TOP HUD ---------- */
+#hud{
+  flex:0 0 auto;padding:8px 10px 6px;display:flex;flex-direction:column;gap:5px;
+  background:linear-gradient(180deg,rgba(11,15,40,.92),rgba(11,15,40,.55) 80%,transparent);
+  z-index:30;
+}
+#hudTop{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 6px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03));
+  border:1px solid var(--line);font-size:.86rem;box-shadow:0 2px 6px rgba(0,0,0,.25);
+  white-space:nowrap;
+}
+.chip .ico{font-size:1rem;filter:drop-shadow(0 0 4px rgba(255,255,255,.35))}
+.chip.coin .num{color:var(--gold2)}
+.chip.dh .num{color:#c8f4ff}
+.chip.gem .num{color:var(--pink2)}
+.chip.shard .num{color:var(--mint2)}
+.chip.pulse{animation:chipPulse .5s ease}
+@keyframes chipPulse{40%{transform:scale(1.12);box-shadow:0 0 14px rgba(61,240,184,.6)}}
+.chip.buff{border-color:var(--gold);animation:glowPulse 1.2s infinite}
+.chip.buff .num{color:var(--gold2)}
+
+/* Golden Candle — rare tappable flying bonus */
+.goldCandle{position:absolute;z-index:65;width:54px;height:54px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:1.7rem;cursor:pointer;
+  background:radial-gradient(circle at 35% 30%,#fff3c4,#f5b93a 70%,#c78a12);
+  border:2px solid #ffe9a8;box-shadow:0 0 18px rgba(255,215,94,.9);
+  animation:candleFly 9s linear forwards}
+.goldCandle i{font-style:normal;animation:candleBob 1.1s ease-in-out infinite;display:block}
+@keyframes candleFly{from{left:-60px}to{left:calc(100% + 10px)}}
+@keyframes candleBob{50%{transform:translateY(-12px) rotate(9deg)}}
+#settingsBtn{margin-left:auto;font-size:1.25rem;width:36px;height:36px;border-radius:12px;
+  background:rgba(255,255,255,.07);border:1px solid var(--line);transition:transform .2s}
+#settingsBtn:active{transform:rotate(90deg) scale(.9)}
+#energyRow{display:flex;align-items:center;gap:8px}
+#energyBarWrap{flex:1;height:18px;border-radius:999px;background:rgba(0,0,0,.4);
+  border:1px solid var(--line);overflow:hidden;position:relative}
+#energyBar{height:100%;width:0%;border-radius:999px;
+  background:linear-gradient(90deg,#ffd75e,#ffb84d,#ff9d6f);
+  box-shadow:0 0 12px rgba(255,215,94,.55);transition:width .25s}
+#energyTxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:800;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+#energyRegen{font-size:.72rem;color:var(--gold2);white-space:nowrap}
+
+/* ---------- SCREENS ---------- */
+#screens{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:4px 10px calc(var(--nav-h) + 18px);scroll-behavior:smooth}
+.screen{display:none;animation:screenIn .22s ease}
+.screen.active{display:block}
+@keyframes screenIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.screenTitle{font-size:1.15rem;font-weight:900;margin:8px 2px 2px;display:flex;align-items:center;gap:8px}
+.screenTitle small{font-size:.72rem;color:var(--dim);font-weight:600}
+.sub{color:var(--dim);font-size:.78rem;margin:0 2px 8px}
+
+/* ---------- CARDS ---------- */
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:10px;margin-bottom:10px;position:relative;overflow:hidden;
+  box-shadow:0 6px 16px rgba(0,0,0,.28);
+}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:38%;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),transparent);pointer-events:none;border-radius:18px 18px 0 0}
+.cardTitle{font-weight:900;font-size:.95rem;display:flex;align-items:center;gap:6px}
+.tag{font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase}
+.tag.soon{background:rgba(255,255,255,.1);color:var(--dim)}
+.tag.live{background:linear-gradient(90deg,#ff6fb5,#ff9d6f);color:#fff;animation:glowPulse 1.4s infinite}
+.tag.new{background:var(--mint);color:#063}
+@keyframes glowPulse{50%{filter:brightness(1.35)}}
+
+/* ---------- BUTTONS ---------- */
+.btn{
+  border-radius:14px;padding:8px 14px;font-weight:900;font-size:.85rem;
+  background:linear-gradient(180deg,#3f4a9e,#2c3480);border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 3px 0 rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.22);
+  transition:transform .08s,filter .15s;text-align:center;
+}
+.btn:active{transform:translateY(2px) scale(.97);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+.btn.mint{background:linear-gradient(180deg,#3df0b8,#18b985);color:#04351f;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.btn.pink{background:linear-gradient(180deg,#ff8ac2,#f0489c);color:#fff}
+.btn.gold{background:linear-gradient(180deg,#ffe089,#f5b93a);color:#5c3d00}
+.btn.blue{background:linear-gradient(180deg,#7fb2ff,#4a7de0);color:#fff}
+.btn.ghost{background:rgba(255,255,255,.07)}
+.btn:disabled,.btn.off{filter:grayscale(.85) brightness(.6);cursor:not-allowed}
+.btn.shake{animation:shake .3s}
+@keyframes shake{20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.cost{font-size:.72rem;font-weight:800;opacity:.95;display:block}
+
+/* ---------- RIG CARD ---------- */
+.rig{display:grid;grid-template-columns:78px 1fr 86px;gap:8px;align-items:center}
+.rigArtWrap{width:78px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.rigArt{width:72px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(80% 80% at 50% 30%,rgba(255,255,255,.14),rgba(0,0,0,.28));
+  border:1px solid var(--line);position:relative;overflow:visible}
+.rigArt svg{width:60px;height:48px;overflow:visible}
+.rigArt.tier1 svg{filter:drop-shadow(0 0 6px rgba(61,240,184,.7))}
+.rigArt.tier2{background:radial-gradient(80% 80% at 50% 30%,rgba(255,111,181,.30),rgba(0,0,0,.3));border-color:var(--pink)}
+.rigArt.tier2 svg{filter:drop-shadow(0 0 8px rgba(255,111,181,.9)) drop-shadow(0 0 16px rgba(255,215,94,.5))}
+.rigCnt{font-size:.7rem;font-weight:900;color:var(--gold2);background:rgba(0,0,0,.35);
+  padding:1px 8px;border-radius:999px;border:1px solid var(--line)}
+.opSlot{margin-top:2px;height:44px;display:flex;align-items:center;justify-content:center;position:relative}
+.opSlot .chibi{width:40px;height:44px}
+.opSlot .noOp{font-size:.6rem;color:var(--dim);text-align:center;line-height:1.15}
+.rigMid{min-width:0}
+.rigName{font-weight:900;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rigProfit{font-size:.76rem;color:var(--mint2);margin:1px 0 3px}
+.rigProfit .per{color:var(--dim);font-weight:600}
+.msBarWrap{height:8px;border-radius:99px;background:rgba(0,0,0,.4);overflow:hidden;margin:3px 0 5px;border:1px solid rgba(255,255,255,.06)}
+.msBar{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width .2s}
+.msLabel{font-size:.62rem;color:var(--dim);margin-bottom:4px}
+.stages{display:flex;flex-direction:column;gap:3px}
+.stage{display:flex;align-items:center;gap:5px;font-size:.68rem}
+.dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 5px currentColor}
+.dot.g{background:var(--mint);color:var(--mint)}
+.dot.y{background:var(--gold);color:var(--gold)}
+.dot.r{background:var(--red);color:var(--red);animation:glowPulse 1s infinite}
+.stName{width:70px;color:var(--dim);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 0 auto}
+.stLv{width:34px;font-weight:800}
+.stUp{margin-left:auto;font-size:.62rem;padding:2px 8px;border-radius:9px;font-weight:900;
+  background:linear-gradient(180deg,#3f4a9e,#2c3480);border:1px solid rgba(255,255,255,.14);white-space:nowrap}
+.stUp.can{background:linear-gradient(180deg,#57e6b5,#20a87c);color:#04351f}
+.stUp.off{filter:grayscale(.8) brightness(.65)}
+.rigRight{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.tapBtn{
+  width:64px;height:64px;border-radius:50%;position:relative;font-size:1.5rem;
+  background:radial-gradient(70% 70% at 50% 35%,#ff9dce,#f0489c 70%,#c22d7a);
+  border:2px solid rgba(255,255,255,.35);box-shadow:0 4px 0 #8e1f58,0 0 16px rgba(255,111,181,.4);
+  transition:transform .06s;display:flex;align-items:center;justify-content:center;
+}
+.tapBtn:active{transform:scale(.88)}
+.tapBtn .ring{position:absolute;inset:-6px;border-radius:50%;
+  background:conic-gradient(var(--mint) calc(var(--p,0)*1%), rgba(255,255,255,.08) 0);
+  -webkit-mask:radial-gradient(circle,transparent 64%,#000 66%);mask:radial-gradient(circle,transparent 64%,#000 66%)}
+.tapBtn.ready{animation:readyBob 1s infinite}
+@keyframes readyBob{50%{box-shadow:0 4px 0 #8e1f58,0 0 26px rgba(61,240,184,.8)}}
+.tapBtn.auto{background:radial-gradient(70% 70% at 50% 35%,#8ffce0,#18b985 70%,#0d7d59);box-shadow:0 4px 0 #07543b,0 0 14px rgba(61,240,184,.4)}
+.buyBtn{width:86px;padding:6px 4px;border-radius:12px;font-size:.72rem}
+.abilBtn{position:absolute;right:-6px;top:-6px;width:26px;height:26px;border-radius:50%;font-size:.8rem;
+  background:radial-gradient(circle at 35% 30%,#fff3c4,#f5b93a);border:1px solid #fff;
+  box-shadow:0 0 8px rgba(255,215,94,.8);display:flex;align-items:center;justify-content:center;z-index:2}
+.abilBtn.cd{background:rgba(30,36,80,.9);box-shadow:none;color:var(--dim);font-size:.55rem;font-weight:900}
+.rigLocked{display:flex;align-items:center;gap:10px;opacity:.95}
+.rigLocked .rigArt{filter:grayscale(1) brightness(.6)}
+
+/* buy amount toggle */
+#buyAmtRow{display:flex;gap:6px;margin:6px 0 10px;align-items:center}
+.amtBtn{flex:1;padding:6px 0;border-radius:11px;font-weight:900;font-size:.78rem;
+  background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--dim)}
+.amtBtn.sel{background:linear-gradient(180deg,#7fb2ff,#4a7de0);color:#fff;border-color:rgba(255,255,255,.4)}
+
+/* ---------- CHIBI CHARACTERS ---------- */
+.chibi{display:inline-block;width:64px;height:70px;animation:idleBob 2.6s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes idleBob{50%{transform:translateY(-2px) scale(1.02,0.98)}}
+.chibi.happy{animation:happyBounce .5s ease}
+@keyframes happyBounce{30%{transform:translateY(-7px) scale(1.08,.92)}60%{transform:translateY(0) scale(.95,1.05)}}
+.chibi.cast{animation:castSpin .7s ease}
+@keyframes castSpin{40%{transform:translateY(-9px) rotate(-8deg) scale(1.15)}70%{transform:rotate(6deg)}}
+.opCard{display:grid;grid-template-columns:66px 1fr auto;gap:10px;align-items:center}
+.opFrame{width:62px;height:68px;border-radius:15px;display:flex;align-items:flex-end;justify-content:center;
+  background:radial-gradient(90% 90% at 50% 20%,rgba(255,255,255,.14),rgba(0,0,0,.3));
+  border:2px solid var(--rar-common);position:relative;overflow:hidden}
+.opFrame .chibi{width:52px;height:58px}
+.opFrame.rar-common{border-color:var(--rar-common)}
+.opFrame.rar-rare{border-color:var(--rar-rare);box-shadow:0 0 8px rgba(88,166,255,.5)}
+.opFrame.rar-epic{border-color:var(--rar-epic);box-shadow:0 0 10px rgba(180,140,255,.6)}
+.opFrame.rar-legendary{border-color:var(--rar-legendary);box-shadow:0 0 12px rgba(255,215,94,.7)}
+.opFrame.rar-mythic{border:2px solid transparent;background:
+  linear-gradient(rgba(20,25,60,.9),rgba(20,25,60,.9)) padding-box,
+  linear-gradient(120deg,#ff6fb5,#ffd75e,#3df0b8,#6fa8ff,#b48cff,#ff6fb5) border-box;
+  animation:mythicShift 3s linear infinite;background-size:auto,300% 300%;box-shadow:0 0 14px rgba(255,180,255,.65)}
+@keyframes mythicShift{to{background-position:0 0,300% 0}}
+.rarName{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+.rar-common .rarName,.rarName.rar-common{color:var(--rar-common)}
+.rarName.rar-rare{color:var(--rar-rare)} .rarName.rar-epic{color:var(--rar-epic)}
+.rarName.rar-legendary{color:var(--rar-legendary)} .rarName.rar-mythic{background:linear-gradient(90deg,#ff6fb5,#ffd75e,#3df0b8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.opInfo{min-width:0}
+.opName{font-weight:900;font-size:.9rem}
+.opDesc{font-size:.7rem;color:var(--dim);margin:2px 0}
+.opAbil{font-size:.72rem;color:var(--gold2);font-weight:700}
+.opBtns{display:flex;flex-direction:column;gap:5px;align-items:stretch;min-width:96px}
+.skinRow{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.skinDot{width:30px;height:30px;border-radius:10px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;background:rgba(0,0,0,.3)}
+.skinDot.sel{border-color:var(--mint);box-shadow:0 0 8px rgba(61,240,184,.6)}
+
+/* ---------- FLOATING NUMBERS / FX ---------- */
+#floats{position:absolute;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.floatTxt{position:absolute;font-weight:900;font-size:1rem;color:var(--mint2);
+  text-shadow:0 0 8px rgba(61,240,184,.8),0 2px 2px rgba(0,0,0,.6);
+  animation:floatUp 1s ease-out forwards;white-space:nowrap}
+.floatTxt.gold{color:var(--gold2);text-shadow:0 0 10px rgba(255,215,94,.9),0 2px 2px rgba(0,0,0,.6);font-size:1.2rem}
+@keyframes floatUp{from{opacity:1;transform:translateY(0) scale(.8)}30%{transform:translateY(-18px) scale(1.1)}to{opacity:0;transform:translateY(-52px) scale(1)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:70}
+#app.shakeLite{animation:shakeLite .4s}
+@keyframes shakeLite{20%{transform:translate(2px,-2px)}40%{transform:translate(-2px,2px)}60%{transform:translate(1px,-1px)}80%{transform:translate(-1px,1px)}}
+
+/* ---------- NAV ---------- */
+#nav{
+  position:absolute;left:0;right:0;bottom:0;height:var(--nav-h);display:flex;z-index:40;
+  background:linear-gradient(180deg,rgba(17,22,54,.96),rgba(11,15,40,.99));
+  border-top:1px solid var(--line);backdrop-filter:blur(6px);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.navBtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  font-size:1.15rem;color:var(--dim);position:relative;transition:transform .1s}
+.navBtn span{font-size:.52rem;font-weight:800;letter-spacing:.02em}
+.navBtn.sel{color:var(--pink2);transform:translateY(-2px)}
+.navBtn.sel::after{content:"";position:absolute;bottom:4px;width:18px;height:3px;border-radius:2px;background:var(--pink)}
+.navBtn .bdg{position:absolute;top:4px;right:50%;margin-right:-20px;min-width:15px;height:15px;border-radius:8px;
+  background:var(--red);color:#fff;font-size:.58rem;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 3px}
+
+/* ---------- MODALS / TOASTS ---------- */
+#modalWrap{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;
+  background:rgba(5,8,24,.72);backdrop-filter:blur(4px);padding:16px}
+#modalWrap.open{display:flex}
+#modalBox{width:100%;max-width:420px;max-height:86vh;overflow-y:auto;border-radius:22px;padding:16px;
+  background:linear-gradient(180deg,#232a6e,#171d4e);border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 20px 60px rgba(0,0,0,.6);animation:popIn .25s cubic-bezier(.2,1.4,.4,1)}
+@keyframes popIn{from{transform:scale(.8);opacity:0}}
+.modalTitle{font-size:1.1rem;font-weight:900;text-align:center;margin-bottom:8px}
+.modalBody{font-size:.85rem;color:var(--text)}
+.modalBtns{display:flex;gap:8px;margin-top:14px}
+.modalBtns .btn{flex:1}
+#toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + 12px);z-index:80;
+  display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;width:min(92vw,420px)}
+.toast{background:linear-gradient(180deg,#2b3487,#1e2560);border:1px solid rgba(255,255,255,.2);
+  padding:8px 14px;border-radius:14px;font-size:.78rem;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.45);
+  animation:toastIn .3s ease,toastOut .4s ease 3.4s forwards;text-align:center}
+@keyframes toastIn{from{transform:translateY(14px);opacity:0}}
+@keyframes toastOut{to{transform:translateY(8px);opacity:0}}
+
+/* ---------- TASKS / ACHIEVEMENTS ---------- */
+.taskRow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed rgba(255,255,255,.07)}
+.taskRow:last-child{border-bottom:none}
+.taskInfo{flex:1;min-width:0}
+.taskName{font-size:.8rem;font-weight:800}
+.taskProg{height:7px;border-radius:99px;background:rgba(0,0,0,.4);overflow:hidden;margin-top:4px}
+.taskProg i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),var(--blue));transition:width .3s}
+.taskPct{font-size:.62rem;color:var(--dim);margin-top:2px}
+.taskRew{font-size:.7rem;font-weight:800;color:var(--gold2);white-space:nowrap}
+.claimBtn{padding:6px 12px;border-radius:11px;font-size:.72rem;font-weight:900}
+.achGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;margin-top:8px}
+.ach{aspect-ratio:1;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;
+  background:rgba(0,0,0,.3);border:1px solid var(--line);filter:grayscale(1) brightness(.45)}
+.ach.done{filter:none;background:radial-gradient(circle at 35% 30%,rgba(255,215,94,.35),rgba(0,0,0,.25));
+  border-color:var(--gold);box-shadow:0 0 6px rgba(255,215,94,.35)}
+
+/* ---------- RESEARCH ---------- */
+.labGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.labBranch{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:8px}
+.labBranch h4{font-size:.78rem;margin-bottom:6px;display:flex;gap:5px;align-items:center}
+.labNode{display:flex;align-items:center;gap:6px;padding:5px;border-radius:11px;margin-bottom:5px;
+  background:rgba(0,0,0,.25);border:1px solid var(--line);font-size:.68rem}
+.labNode.owned{border-color:var(--mint);background:rgba(61,240,184,.1)}
+.labNode.lockedN{opacity:.45}
+.labNode .btn{padding:4px 8px;font-size:.62rem;margin-left:auto;border-radius:9px}
+.labNode b{display:block;font-size:.7rem}
+
+/* ---------- PRESTIGE ---------- */
+.dhBig{text-align:center;padding:12px 0 4px}
+.dhBig .v{font-size:2rem;font-weight:900;color:#c8f4ff;text-shadow:0 0 18px rgba(120,220,255,.6)}
+.dhGainBar{height:14px;border-radius:99px;background:rgba(0,0,0,.4);overflow:hidden;border:1px solid var(--line);margin:8px 0}
+.dhGainBar i{display:block;height:100%;background:linear-gradient(90deg,#7fdcff,#b48cff);transition:width .3s}
+.shopItem{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.07)}
+.shopItem:last-child{border:none}
+.shopIco{font-size:1.5rem;width:40px;height:40px;border-radius:12px;background:rgba(0,0,0,.3);
+  display:flex;align-items:center;justify-content:center;border:1px solid var(--line);flex:0 0 auto}
+.shopInfo{flex:1;min-width:0}
+.shopName{font-size:.8rem;font-weight:900}
+.shopDesc{font-size:.68rem;color:var(--dim)}
+
+/* ---------- EVENTS ---------- */
+.evBanner{background:linear-gradient(120deg,#3c1f6e,#6e1f52 60%,#8a2a3d);border-radius:18px;padding:12px;
+  border:1px solid rgba(255,150,200,.35);margin-bottom:10px;position:relative;overflow:hidden}
+.evBanner::after{content:"🚀";position:absolute;right:8px;top:6px;font-size:2.2rem;opacity:.5;transform:rotate(20deg)}
+.evTimer{font-weight:900;color:var(--gold2)}
+#pumpBtn{width:150px;height:150px;border-radius:50%;margin:10px auto;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:#fff;
+  background:radial-gradient(70% 70% at 50% 30%,#ff9dce,#f0489c 60%,#a4246a);
+  border:3px solid rgba(255,255,255,.4);box-shadow:0 6px 0 #781a4d,0 0 30px rgba(255,111,181,.5);transition:transform .05s}
+#pumpBtn:active{transform:scale(.92)}
+.hypeWrap{height:16px;border-radius:99px;background:rgba(0,0,0,.45);overflow:hidden;border:1px solid var(--line)}
+.hypeWrap i{display:block;height:100%;background:linear-gradient(90deg,#ff6fb5,#ffd75e);transition:width .1s}
+.chartLine{height:56px;margin:6px 0}
+
+/* ---------- WELCOME BACK ---------- */
+.welcomeCoin{display:flex;justify-content:space-between;font-size:1rem;padding:6px 4px}
+.welcomeCoin .num{color:var(--gold2)}
+.bigCountUp{font-size:1.9rem;text-align:center;font-weight:900;color:var(--mint2);
+  text-shadow:0 0 20px rgba(61,240,184,.7);padding:8px 0}
+
+/* ---------- SETTINGS ---------- */
+.setRow{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:.85rem}
+.setRow input[type=range]{flex:1;accent-color:var(--pink)}
+.ioArea{width:100%;height:70px;background:rgba(0,0,0,.4);border:1px solid var(--line);border-radius:10px;
+  color:var(--mint2);font-size:.62rem;padding:6px;resize:none;user-select:text;-webkit-user-select:text}
+.dangerInput{width:100%;padding:8px;border-radius:10px;border:1px solid var(--red);background:rgba(0,0,0,.4);
+  color:#fff;font-weight:900;text-align:center;letter-spacing:.2em}
+
+/* ---------- CHAINS ---------- */
+.chainCard{display:flex;gap:10px;align-items:center}
+.chainIco{font-size:2rem;width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.2),rgba(0,0,0,.3));border:1px solid var(--line);flex:0 0 auto}
+.chainCard.lockedC{opacity:.7}
+.chainCard.lockedC .chainIco{filter:grayscale(1) brightness(.6)}
+
+@media (max-width:420px){
+  :root{font-size:14px}
+  .rig{grid-template-columns:64px 1fr 76px}
+  .rigArtWrap{width:64px}.rigArt{width:60px;height:50px}
+  .tapBtn{width:56px;height:56px}
+  .buyBtn{width:76px}
+  .stName{width:62px;font-size:.62rem}
+}
+@media (min-width:700px){
+  .achGrid{grid-template-columns:repeat(auto-fill,minmax(50px,1fr))}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="hud">
+    <div id="hudTop">
+      <span class="chip coin" id="chipCoin"><span class="ico" id="hudCoinIco">🪙</span><span class="num" id="hudCoinV">0</span>&nbsp;<span id="hudCoinSym" style="font-size:.7rem;color:var(--dim)">₿M</span></span>
+      <span class="chip dh" id="chipDH" title="Diamond Hands (prestige)"><span class="ico">💎🙌</span><span class="num" id="hudDHV">0</span></span>
+      <span class="chip gem" id="chipGem" title="Gems"><span class="ico">💠</span><span class="num" id="hudGemV">0</span></span>
+      <span class="chip shard" id="chipShard" title="Research Shards"><span class="ico">🔬</span><span class="num" id="hudShardV">0</span></span>
+      <span class="chip buff" id="chipBuff" style="display:none" title="Active boost"><span class="ico">🚀</span><span class="num" id="hudBuffV"></span></span>
+      <button id="settingsBtn" title="Settings">⚙️</button>
+    </div>
+    <div id="energyRow">
+      <div id="energyBarWrap"><div id="energyBar"></div><div id="energyTxt">⚡ 0 / 0</div></div>
+      <span id="energyRegen">+1.0/s</span>
+    </div>
+  </header>
+
+  <main id="screens">
+    <section class="screen" id="screen-chains"></section>
+    <section class="screen active" id="screen-miners"></section>
+    <section class="screen" id="screen-ops"></section>
+    <section class="screen" id="screen-tasks"></section>
+    <section class="screen" id="screen-lab"></section>
+    <section class="screen" id="screen-prestige"></section>
+    <section class="screen" id="screen-events"></section>
+    <section class="screen" id="screen-shop"></section>
+  </main>
+
+  <nav id="nav">
+    <button class="navBtn" data-scr="chains">🌐<span>Chains</span></button>
+    <button class="navBtn sel" data-scr="miners">⛏️<span>Miners</span></button>
+    <button class="navBtn" data-scr="ops">👧<span>Operators</span><b class="bdg" id="bdgOps" style="display:none"></b></button>
+    <button class="navBtn" data-scr="tasks">✅<span>Tasks</span><b class="bdg" id="bdgTasks" style="display:none"></b></button>
+    <button class="navBtn" data-scr="lab">🔬<span>Lab</span><b class="bdg" id="bdgLab" style="display:none"></b></button>
+    <button class="navBtn" data-scr="prestige">💎<span>Prestige</span><b class="bdg" id="bdgPrestige" style="display:none"></b></button>
+    <button class="navBtn" data-scr="events">🔥<span>Events</span><b class="bdg" id="bdgEvents" style="display:none"></b></button>
+    <button class="navBtn" data-scr="shop">🛍️<span>Shop</span></button>
+  </nav>
+
+  <div id="floats"></div>
+</div>
+
+<canvas id="fx"></canvas>
+<div id="toasts"></div>
+<div id="modalWrap"><div id="modalBox"></div></div>
+
+<script>
+'use strict';
+/* ============================================================
+   SECTION: BIG NUMBERS
+   Mantissa/exponent decimal — never Infinity, never NaN.
+   ============================================================ */
+class D{
+  constructor(m=0,e=0){this.m=m;this.e=e;this.norm();}
+  static from(x){
+    if(x instanceof D) return new D(x.m,x.e);
+    if(typeof x==='object'&&x&&typeof x.m==='number') return new D(x.m,x.e|0);
+    if(typeof x==='string') x=parseFloat(x)||0;
+    if(typeof x!=='number'||!isFinite(x)) x=0;
+    return new D(x,0);
+  }
+  norm(){
+    if(!isFinite(this.m)||this.m===0){this.m=0;this.e=0;return this;}
+    const a=Math.abs(this.m);
+    if(a>=1&&a<10) return this;
+    const d=Math.floor(Math.log10(a));
+    this.m/=Math.pow(10,d); this.e+=d;
+    if(Math.abs(this.m)>=10){this.m/=10;this.e++;}
+    if(Math.abs(this.m)<1){this.m*=10;this.e--;}
+    return this;
+  }
+  add(o){o=D.from(o);
+    if(this.m===0)return new D(o.m,o.e);
+    if(o.m===0)return new D(this.m,this.e);
+    if(this.e-o.e>15)return new D(this.m,this.e);
+    if(o.e-this.e>15)return new D(o.m,o.e);
+    const e=Math.max(this.e,o.e);
+    return new D(this.m*Math.pow(10,this.e-e)+o.m*Math.pow(10,o.e-e),e);
+  }
+  sub(o){o=D.from(o);return this.add(new D(-o.m,o.e));}
+  mul(o){o=D.from(o);return new D(this.m*o.m,this.e+o.e);}
+  div(o){o=D.from(o);if(o.m===0)return new D(0,0);return new D(this.m/o.m,this.e-o.e);}
+  pow(p){
+    if(this.m===0)return new D(0,0);
+    if(this.m<0)return new D(0,0);
+    const l=(Math.log10(this.m)+this.e)*p, e=Math.floor(l);
+    return new D(Math.pow(10,l-e),e);
+  }
+  sqrt(){return this.pow(0.5);}
+  cmp(o){o=D.from(o);
+    if(this.m===0&&o.m===0)return 0;
+    if(this.m===0)return o.m>0?-1:1;
+    if(o.m===0)return this.m>0?1:-1;
+    if(this.m>0&&o.m<0)return 1;
+    if(this.m<0&&o.m>0)return -1;
+    const s=this.m>0?1:-1;
+    if(this.e!==o.e)return(this.e>o.e?1:-1)*s;
+    return this.m===o.m?0:(this.m>o.m?1:-1)*s;
+  }
+  gte(o){return this.cmp(o)>=0} gt(o){return this.cmp(o)>0}
+  lte(o){return this.cmp(o)<=0} lt(o){return this.cmp(o)<0}
+  num(){const v=this.m*Math.pow(10,this.e);return isFinite(v)?v:(this.m>0?1e308:-1e308);}
+  isZero(){return this.m===0}
+}
+const D0=()=>new D(0,0);
+
+/* AdCap-style suffixes: K M B T Qa Qi Sx Sp Oc No Dc ... */
+const SUF=['','K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc','UDc','DDc','TDc','QaDc','QiDc','SxDc','SpDc','OcDc','NoDc','Vg'];
+function fmt(x){
+  const d=D.from(x);
+  if(d.m===0)return'0';
+  if(d.m<0)return'-'+fmt(new D(-d.m,d.e));
+  if(d.e<3){
+    const n=d.num();
+    if(n<10&&n!==Math.floor(n))return(Math.floor(n*10)/10).toFixed(1);
+    return String(Math.floor(n));
+  }
+  const t=Math.floor(d.e/3);
+  if(t<SUF.length){
+    const v=d.m*Math.pow(10,d.e-3*t);
+    return(v>=100?v.toFixed(1):v.toFixed(2))+SUF[t];
+  }
+  return d.m.toFixed(2)+'e'+d.e;
+}
+function fmtInt(n){return fmt(D.from(Math.floor(n)))}
+function fmtTime(s){
+  s=Math.max(0,Math.ceil(s));
+  if(s<60)return s+'s';
+  if(s<3600)return Math.floor(s/60)+'m '+(s%60)+'s';
+  const h=Math.floor(s/3600),m=Math.floor(s%3600/60);
+  if(s<86400)return h+'h '+m+'m';
+  return Math.floor(s/86400)+'d '+Math.floor(s%86400/3600)+'h';
+}
+
+/* ============================================================
+   SECTION: GAME DATA — CHAINS / RIGS
+   Rig purchases cost Energy (shared, AdVenture-Communist style).
+   Sub-stage upgrades + Operator hires cost the chain coin.
+   ============================================================ */
+const RIG_GROWTH=1.12, SUB_GROWTH=1.08, CYCLE_FLOOR=0.3;
+
+const CHAINS=[
+ {id:'genesis',name:'Genesis Chain',ico:'🌱',coin:'BitMiko',sym:'₿M',coinIco:'🪙',K:5e6,
+  desc:'Where every HODL legend begins. One cracked laptop, infinite dreams.',
+  rigs:[
+   {name:'Cracked Laptop',    ico:'laptop',   p:1,     cyc:1.5, e:4},
+   {name:'GPU Rig',           ico:'gpu',      p:12,    cyc:3,   e:16},
+   {name:'Rack Server',       ico:'rack',     p:100,   cyc:6,   e:50},
+   {name:'ASIC Farm',         ico:'chip',     p:900,   cyc:12,  e:140},
+   {name:'Mining Container',  ico:'box',      p:8500,  cyc:24,  e:400},
+   {name:'Solar Mine Field',  ico:'solar',    p:8e4,   cyc:48,  e:1100},
+   {name:'Geothermal Node',   ico:'volcano',  p:7.5e5, cyc:96,  e:3000},
+   {name:'Underwater Vault',  ico:'sub',      p:7.5e6, cyc:192, e:8000},
+   {name:'Orbital Miner',     ico:'sat',      p:8e7,   cyc:384, e:14000},
+   {name:'Dyson Node',        ico:'dyson',    p:1e9,   cyc:768, e:26000},
+  ]},
+ {id:'layer2',name:'Layer2 Chain',ico:'🌙',coin:'StakeShiba',sym:'STK',coinIco:'🐕',K:5e9,
+  desc:'Staking pools under a neon moon. Slower cycles, monstrous payouts.',
+  unlockDesc:'Reach 100T ₿M lifetime earnings on Genesis Chain',unlockLife:new D(1,14),
+  rigs:[
+   {name:'Validator Node',    ico:'rack',   p:100,   cyc:4,    e:30},
+   {name:'Delegation Pool',   ico:'sub',    p:1200,  cyc:8,    e:100},
+   {name:'Liquidity Vault',   ico:'box',    p:12e3,  cyc:16,   e:300},
+   {name:'Yield Garden',      ico:'solar',  p:1.1e5, cyc:32,   e:800},
+   {name:'Restake Reactor',   ico:'chip',   p:1e6,   cyc:64,   e:2000},
+   {name:'Slashing Shield',   ico:'gpu',    p:9e6,   cyc:128,  e:5000},
+   {name:'Governance Citadel',ico:'volcano',p:8e7,   cyc:256,  e:12000},
+   {name:'Cross-Chain Bridge',ico:'sat',    p:7e8,   cyc:512,  e:25000},
+   {name:'MEV Lighthouse',    ico:'laptop', p:6e9,   cyc:1024, e:50000},
+   {name:'Shiba Singularity', ico:'dyson',  p:5e10,  cyc:2048, e:100000},
+  ]},
+ {id:'moonore',name:'MoonOre Chain',ico:'🪨',coin:'MoonOre',sym:'MOR',coinIco:'🌑',K:5e12,
+  desc:'NFT-mining hybrid rigs chiselling collectible ore from lunar regolith.',
+  unlockDesc:'Reach 10Qa ₿M lifetime earnings on Genesis Chain',unlockLife:new D(1,16),rigs:[]},
+ {id:'neoyen',name:'NeoYen Chain',ico:'🏙️',coin:'NeoYen',sym:'NYN',coinIco:'💴',K:5e15,
+  desc:'Stablecoin arbitrage bots weaving through a cyber-Tokyo skyline. Slow. Huge.',
+  unlockDesc:'Reach 1Sx ₿M lifetime earnings on Genesis Chain',unlockLife:new D(1,21),rigs:[]},
+ {id:'quantum',name:'Quantum Chain',ico:'⚛️',coin:'QuantumCoin',sym:'QTC',coinIco:'🔮',K:5e18,
+  desc:'The endgame. Numbers so big they need their own physics.',
+  unlockDesc:'Prestige at least once on Genesis Chain',unlockPrestige:1,rigs:[]},
+];
+
+/* Milestone multipliers every N owned — AdCap "unlocks" cadence */
+const MS_STEPS=[{c:25,m:2},{c:50,m:2},{c:100,m:3},{c:150,m:2},{c:200,m:5},{c:300,m:3},{c:400,m:3},{c:500,m:5}];
+function msMult(cnt){
+  let m=1;
+  for(const s of MS_STEPS)if(cnt>=s.c)m*=s.m;
+  if(cnt>500)m*=Math.pow(3,Math.floor((cnt-500)/100));
+  return m;
+}
+function nextMs(cnt){
+  for(const s of MS_STEPS)if(cnt<s.c)return s.c;
+  return 500+(Math.floor((cnt-500)/100)+1)*100;
+}
+function prevMs(cnt){
+  let p=0;
+  for(const s of MS_STEPS)if(cnt>=s.c)p=s.c;
+  if(cnt>500)p=500+Math.floor((cnt-500)/100)*100;
+  return p;
+}
+
+/* ============================================================
+   SECTION: GAME DATA — OPERATORS (Managers)
+   hire cost is in chain coin; ability = timed burst multiplier.
+   ============================================================ */
+const RARS=['common','rare','epic','legendary','mythic'];
+const RAR_LABEL={common:'Common',rare:'Rare',epic:'Epic',legendary:'Legendary',mythic:'Mythic'};
+const MGRS=[
+ {name:'Miko-chan',rar:'common',cost:0,free:true,
+  desc:'Pink twin-tails, USB-stick pickaxe, unstoppable optimism. Your day-one bestie.',
+  abil:{name:'Ganbatte Beam',mult:3,dur:30,cd:120,txt:'x3 Cracked Laptop for 30s'},
+  art:{hair:'twin',hc:'#ff7ab8',cc:'#ff9dce',acc:'pickaxe',mouth:'smile'}},
+ {name:'Botto-kun',rar:'common',cost:400,
+  desc:'A shy robot boy who dreams in shader code. Keeps the GPUs purring.',
+  abil:{name:'Overclock!',mult:3,dur:30,cd:150,txt:'x3 GPU Rig for 30s'},
+  art:{hair:'bot',hc:'#8fd3ff',cc:'#6fa8ff',acc:'headset',mouth:'v'}},
+ {name:'Cables-chan',rar:'common',cost:4e3,
+  desc:'Lives inside the server rack. Nobody knows how she got there. Zero tangled wires.',
+  abil:{name:'Cable Management',mult:4,dur:30,cd:180,txt:'x4 Rack Server for 30s'},
+  art:{hair:'bob',hc:'#8affc9',cc:'#3df0b8',acc:'wrench',mouth:'cat'}},
+ {name:'Nonce-neko',rar:'rare',cost:5e4,
+  desc:'A cat-eared gremlin who guesses lucky hashes on the first try. Probably cheating.',
+  abil:{name:'Lucky Nonce',mult:5,dur:30,cd:210,txt:'x5 ASIC Farm for 30s'},
+  art:{hair:'ears',hc:'#ffd75e',cc:'#f5b93a',acc:'none',mouth:'cat'}},
+ {name:'Container Cat',rar:'rare',cost:6e5,
+  desc:'If it fits, it ships (blocks). Sleeps 22 hours a day, still outperforms everyone.',
+  abil:{name:'Box Fort Frenzy',mult:5,dur:30,cd:240,txt:'x5 Mining Container for 30s'},
+  art:{hair:'ears',hc:'#c9b39a',cc:'#b48cff',acc:'box',mouth:'sleepy'}},
+ {name:'Solar-hime',rar:'rare',cost:8e6,
+  desc:'A sun princess who photosynthesizes hashrate. Glows when the market is green.',
+  abil:{name:'Solar Flare',mult:6,dur:30,cd:270,txt:'x6 Solar Mine Field for 30s'},
+  art:{hair:'long',hc:'#ffca6b',cc:'#ffd75e',acc:'sun',mouth:'smile'}},
+ {name:'Geo-kohai',rar:'epic',cost:1e8,
+  desc:'An excitable junior geologist. Taps volcanoes politely before drilling them.',
+  abil:{name:'Magma Surge',mult:7,dur:30,cd:300,txt:'x7 Geothermal Node for 30s'},
+  art:{hair:'spiky',hc:'#ff8d6f',cc:'#ff7a8a',acc:'helmet',mouth:'v'}},
+ {name:'Ledger-sensei',rar:'epic',cost:1.5e9,
+  desc:'Calm. Precise. Holds a glowing cold-wallet key and all of your secrets.',
+  abil:{name:'Cold Storage Audit',mult:8,dur:30,cd:300,txt:'x8 Underwater Vault for 30s'},
+  art:{hair:'bob',hc:'#cfd8ff',cc:'#eef2ff',acc:'glasses',mouth:'flat'}},
+ {name:'Whale-tan',rar:'legendary',cost:2e10,
+  desc:'Wears a fluffy coat shaped like a chibi whale. Moves markets by yawning.',
+  abil:{name:'Whale Splash',mult:2,dur:20,cd:300,global:true,txt:'x2 ALL rigs for 20s'},
+  art:{hair:'hood',hc:'#9fd8ff',cc:'#6fa8ff',acc:'whale',mouth:'sleepy'}},
+ {name:'Satoshi-sama',rar:'mythic',cost:3e11,
+  desc:'Nobody has seen their face. Their Dyson Node hums the genesis block as a lullaby.',
+  abil:{name:'Genesis Blessing',mult:3,dur:20,cd:300,global:true,txt:'x3 ALL rigs for 20s'},
+  art:{hair:'hood',hc:'#b48cff',cc:'#232a6e',acc:'crown',mouth:'flat'}},
+];
+/* Layer2 (StakeShiba) roster — same rules, new faces */
+const MGRS_L2=[
+ {name:'Shiba-chan',rar:'common',cost:0,free:true,
+  desc:'A shiba girl who guards her Validator Node like it is a very important stick.',
+  abil:{name:'Awoo Uptime',mult:3,dur:30,cd:120,txt:'x3 Validator Node for 30s'},
+  art:{hair:'ears',hc:'#e8b268',cc:'#ff9d6f',acc:'none',mouth:'cat'}},
+ {name:'Puddle-kun',rar:'common',cost:4e4,
+  desc:'Made of 100% liquidity. Do not leave him near a heater or an exploit.',
+  abil:{name:'Deep Liquidity',mult:3,dur:30,cd:150,txt:'x3 Delegation Pool for 30s'},
+  art:{hair:'bob',hc:'#8fd3ff',cc:'#6fa8ff',acc:'float',mouth:'smile'}},
+ {name:'Yield-yousei',rar:'common',cost:4e5,
+  desc:'A tiny garden fairy who waters APY sprouts every morning. Compounding is her cardio.',
+  abil:{name:'Compound Bloom',mult:4,dur:30,cd:180,txt:'x4 Liquidity Vault for 30s'},
+  art:{hair:'long',hc:'#8affc9',cc:'#3df0b8',acc:'petal',mouth:'smile'}},
+ {name:'Barista Botto',rar:'rare',cost:5e6,
+  desc:'Serves triple-shot restaked lattes. The Yield Garden runs entirely on foam art.',
+  abil:{name:'Espresso Epoch',mult:5,dur:30,cd:210,txt:'x5 Yield Garden for 30s'},
+  art:{hair:'bot',hc:'#c9b39a',cc:'#8a6f4d',acc:'headset',mouth:'v'}},
+ {name:'Guardian Gao',rar:'rare',cost:6e7,
+  desc:'Once ate a slashing penalty and simply refused to be slashed. The Reactor purrs for him.',
+  abil:{name:'Iron Restake',mult:5,dur:30,cd:240,txt:'x5 Restake Reactor for 30s'},
+  art:{hair:'spiky',hc:'#ff8d6f',cc:'#ff7a8a',acc:'helmet',mouth:'flat'}},
+ {name:'Parry-nyan',rar:'rare',cost:8e8,
+  desc:'Deflects slashings with a paw. Claims it is "just reflexes". It is definitely magic.',
+  abil:{name:'Purrfect Block',mult:6,dur:30,cd:270,txt:'x6 Slashing Shield for 30s'},
+  art:{hair:'ears',hc:'#cfd8ff',cc:'#b48cff',acc:'wrench',mouth:'cat'}},
+ {name:'Vote-hime',rar:'epic',cost:1e10,
+  desc:'Every proposal passes when she smiles. Quorum assembles out of sheer devotion.',
+  abil:{name:'Royal Quorum',mult:7,dur:30,cd:300,txt:'x7 Governance Citadel for 30s'},
+  art:{hair:'long',hc:'#ffca6b',cc:'#ffd75e',acc:'crown',mouth:'smile'}},
+ {name:'MEV Phantom',rar:'epic',cost:1.5e11,
+  desc:'Arrives before your transaction does. Nobody knows how. The bridge tolls pay tribute.',
+  abil:{name:'Sandwich Hour',mult:8,dur:30,cd:300,txt:'x8 Cross-Chain Bridge for 30s'},
+  art:{hair:'hood',hc:'#20264f',cc:'#4a4f88',acc:'visor',mouth:'flat'}},
+ {name:'Shiba Shogun',rar:'legendary',cost:2e12,
+  desc:'Commands the MEV Lighthouse fleet with a single dignified bork.',
+  abil:{name:'Bork of War',mult:2,dur:20,cd:300,global:true,txt:'x2 ALL rigs for 20s'},
+  art:{hair:'ears',hc:'#e8b268',cc:'#232a6e',acc:'helmet',mouth:'v'}},
+ {name:'Staked God-sama',rar:'mythic',cost:3e13,
+  desc:'Delegated themselves to themselves at the beginning of time. APY: yes.',
+  abil:{name:'Singularity Yield',mult:3,dur:20,cd:300,global:true,txt:'x3 ALL rigs for 20s'},
+  art:{hair:'hood',hc:'#ffd75e',cc:'#3c1f6e',acc:'crown',mouth:'sleepy'}},
+];
+function mgrDef(c,i){return c===1?MGRS_L2[i]:MGRS[i];}
+
+/* ============================================================
+   SECTION: GAME DATA — SKINS (collectible + small stat bonus)
+   ============================================================ */
+const SKINS=[
+ {id:'sakura', mgr:0,name:'Miko-chan: Sakura Uniform',rar:'rare',bonus:0.02,src:'chest',art:{hc:'#ffb7d9',cc:'#ffd9ec',acc:'petal',hair:'twin',mouth:'smile'}},
+ {id:'hacker', mgr:0,name:'Miko-chan: Neon Hacker',rar:'epic',bonus:0.03,src:'chest',art:{hc:'#ff4fd8',cc:'#101736',acc:'visor',hair:'twin',mouth:'smile'}},
+ {id:'goldbot',mgr:1,name:'Botto-kun: Gold Plated',rar:'epic',bonus:0.03,src:'chest',art:{hc:'#ffe089',cc:'#f5b93a',acc:'headset',hair:'bot',mouth:'v'}},
+ {id:'beach',  mgr:3,name:'Nonce-neko: Beach Day',rar:'rare',bonus:0.02,src:'chest',art:{hc:'#ffd75e',cc:'#3df0b8',acc:'float',hair:'ears',mouth:'cat'}},
+ {id:'prof',   mgr:7,name:'Ledger-sensei: Professor',rar:'epic',bonus:0.03,src:'chest',art:{hc:'#e8ecff',cc:'#4a4f88',acc:'glasses',hair:'bob',mouth:'flat'}},
+ {id:'pajama', mgr:8,name:'Whale-tan: Pajama Party',rar:'legendary',bonus:0.03,src:'chest',art:{hc:'#c9e9ff',cc:'#b48cff',acc:'whale',hair:'hood',mouth:'sleepy'}},
+ {id:'boxfort',mgr:4,name:'Container Cat: Box Fort',rar:'rare',bonus:0.02,src:'chest',art:{hc:'#c9b39a',cc:'#8a6f4d',acc:'box',hair:'ears',mouth:'cat'}},
+ {id:'bunny',  mgr:8,name:'Bull-Run Bunny Suit',rar:'legendary',bonus:0.03,src:'event',art:{hc:'#ff9dce',cc:'#3df0b8',acc:'bunny',hair:'hood',mouth:'smile'},
+  srcTxt:'Pump Event exclusive'},
+ {id:'eclipse',mgr:5,name:'Solar-hime: Eclipse',rar:'epic',bonus:0.03,src:'ach',art:{hc:'#b48cff',cc:'#232a6e',acc:'sun',hair:'long',mouth:'smile'},
+  srcTxt:'Reward: Prestige 3 times'},
+ {id:'idol',   mgr:0,name:'Miko-chan: Mythic Idol',rar:'mythic',bonus:0.05,src:'chest',art:{hc:'#fff',cc:'#ffd75e',acc:'crown',hair:'twin',mouth:'smile'}},
+];
+const CHEST_COST=30;
+const CHEST_POOL=SKINS.filter(s=>s.src==='chest');
+
+/* ============================================================
+   SECTION: GAME DATA — RESEARCH TREE (Blockchain Lab)
+   Spent with Research Shards 🔬 (achievements/milestones only).
+   ============================================================ */
+const RESEARCH=[
+ {id:'p1',br:'profit',name:'Merkle Sprouts',desc:'+25% profit on all Chains',cost:1,profit:0.25},
+ {id:'p2',br:'profit',name:'Sharded Ledgers',desc:'+50% profit on all Chains',cost:2,profit:0.50,req:'p1'},
+ {id:'p3',br:'profit',name:'Zero-Knowledge Zen',desc:'+100% profit on all Chains',cost:4,profit:1.0,req:'p2'},
+ {id:'p4',br:'profit',name:'Consensus of Cuteness',desc:'+200% profit on all Chains',cost:8,profit:2.0,req:'p3'},
+ {id:'a1',br:'auto',name:'Macro Keyboard',desc:'Operator ability cooldowns −10%',cost:1,cdr:0.10},
+ {id:'a2',br:'auto',name:'Task Scheduler',desc:'Operator ability cooldowns −20%',cost:2,cdr:0.20,req:'a1'},
+ {id:'a3',br:'auto',name:'Hype Extender',desc:'Ability buffs last +50% longer',cost:3,dur:0.5,req:'a2'},
+ {id:'a4',br:'auto',name:'Quantum Alarm Clock',desc:'Operator ability cooldowns −50%',cost:6,cdr:0.50,req:'a3'},
+ {id:'o1',br:'off',name:'Night Shift Snacks',desc:'Offline earnings cap: 4h',cost:1,off:4},
+ {id:'o2',br:'off',name:'Dream Mining',desc:'Offline earnings cap: 8h',cost:2,off:8,req:'o1'},
+ {id:'o3',br:'off',name:'Lucid Ledger',desc:'Offline earnings cap: 16h',cost:4,off:16,req:'o2'},
+ {id:'o4',br:'off',name:'Eternal HODL Trance',desc:'Offline earnings cap: 24h',cost:6,off:24,req:'o3'},
+ {id:'e1',br:'energy',name:'Bigger Battery',desc:'+100 max ⚡ Energy',cost:1,cap:100},
+ {id:'e2',br:'energy',name:'Ramen Overclock',desc:'+0.5 ⚡/s regen',cost:2,regen:0.5,req:'e1'},
+ {id:'e3',br:'energy',name:'Fusion Kettle',desc:'+250 max ⚡ and +1 ⚡/s',cost:3,cap:250,regen:1,req:'e2'},
+ {id:'e4',br:'energy',name:'Pocket Sun',desc:'+600 max ⚡ and +2 ⚡/s',cost:5,cap:600,regen:2,req:'e3'},
+];
+const LAB_BRANCHES=[
+ {id:'profit',name:'Global Profit',ico:'💹'},
+ {id:'auto',name:'Automation',ico:'🤖'},
+ {id:'off',name:'Offline Capacity',ico:'🌙'},
+ {id:'energy',name:'Energy',ico:'⚡'},
+];
+
+/* ============================================================
+   SECTION: GAME DATA — DIAMOND HANDS SHOP (prestige shop)
+   Spending Diamond Hands reduces your banked bonus — real choice.
+   ============================================================ */
+const DH_SHOP=[
+ {id:'headstart',name:'HODL Head Start',ico:'🚀',desc:'Start every run on this Chain with 10 free first-rig levels',cost:5,max:1},
+ {id:'pickaxe',name:'Golden Pickaxe',ico:'⛏️',desc:'+25% profit on this Chain permanently (stacks)',cost:3,scale:2,max:99},
+ {id:'battery',name:'Diamond Battery',ico:'🔋',desc:'+250 max ⚡ Energy (stacks)',cost:4,scale:2,max:99},
+ {id:'regen',name:'Turbo Regen',ico:'♻️',desc:'+0.5 ⚡/s Energy regen (stacks)',cost:4,scale:2,max:99},
+ {id:'magnet',name:'Whale Magnet',ico:'🧲',desc:'+10% Diamond Hands gained on prestige (stacks)',cost:10,scale:2,max:10},
+];
+
+/* ============================================================
+   SECTION: GAME DATA — DAILY TASKS / CHAIN MILESTONES
+   ============================================================ */
+const DAILY_POOL=[
+ {id:'taps',name:'Tap rigs 300 times',t:300,val:s=>s.counters.tapsToday,rew:{energy:250}},
+ {id:'spend',name:'Spend 2,000 ⚡ Energy',t:2000,val:s=>s.counters.energyToday,rew:{gems:6}},
+ {id:'abil',name:'Trigger 5 Operator abilities',t:5,val:s=>s.counters.abilToday,rew:{gems:8}},
+ {id:'buy',name:'Buy 25 rig units',t:25,val:s=>s.counters.rigsToday,rew:{shards:1}},
+ {id:'sub',name:'Upgrade sub-stages 15 times',t:15,val:s=>s.counters.subToday,rew:{gems:5}},
+ {id:'hire',name:'Hire or upgrade an Operator',t:1,val:s=>s.counters.hireToday,rew:{energy:150}},
+];
+const MILESTONE_TASKS=[
+ {id:'own1all',name:'Full Portfolio',desc:'Own at least 1 of every Genesis rig',rew:{shards:3,gems:10},
+  chk:g=>g.chains[0].rigs.every(r=>r.cnt>0)},
+ {id:'hireAll',name:'Dream Team',desc:'Hire all 10 Genesis Operators',rew:{shards:5,gems:20},
+  chk:g=>g.chains[0].rigs.every(r=>r.mgr)},
+ {id:'green5',name:'Zen Gardener',desc:'5 rigs perfectly balanced (all green) at once',rew:{shards:3,gems:10},
+  chk:g=>g.chains[0].rigs.filter((r,i)=>r.cnt>0&&bottleneck(0,i).all).length>=5},
+ {id:'rigs100',name:'Rack City',desc:'Own 100 total rig units on Genesis',rew:{shards:2,gems:5},
+  chk:g=>totalRigs(0)>=100},
+ {id:'rigs300',name:'Warehouse Wave',desc:'Own 300 total rig units on Genesis',rew:{shards:3,gems:10},
+  chk:g=>totalRigs(0)>=300},
+ {id:'life9',name:'First Billion',desc:'Earn 1B ₿M lifetime',rew:{shards:2,gems:5},
+  chk:g=>g.chains[0].lifetime.gte(new D(1,9))},
+ {id:'life12',name:'Trillionaire Era',desc:'Earn 1T ₿M lifetime',rew:{shards:3,gems:10},
+  chk:g=>g.chains[0].lifetime.gte(new D(1,12))},
+ {id:'prest1',name:'Diamond Rebirth',desc:'Prestige Genesis Chain once',rew:{shards:5,gems:15},
+  chk:g=>g.chains[0].prestiges>=1},
+ {id:'acct1',name:'Whale Accountant',desc:'Upgrade an Operator to Whale Accountant',rew:{shards:2,gems:5},
+  chk:g=>g.chains[0].rigs.some(r=>r.acct)},
+ {id:'ms25all',name:'Milestone Collector',desc:'Every Genesis rig at 25+ units',rew:{shards:4,gems:15},
+  chk:g=>g.chains[0].rigs.every(r=>r.cnt>=25)},
+];
+
+/* ============================================================
+   SECTION: GAME DATA — ACHIEVEMENT WALL (auto-generated grid)
+   Each grants Research Shards 🔬 (this is where shards come from).
+   ============================================================ */
+const ACHS=[];
+(function(){
+  const rigTiers=[10,25,50,100];
+  CHAINS[0].rigs.forEach((r,i)=>{
+    rigTiers.forEach(t=>ACHS.push({id:'rig'+i+'_'+t,ico:'⛏️',name:t+'× '+r.name,shards:t>=100?2:1,
+      chk:g=>g.chains[0].rigs[i].cnt>=t}));
+  });
+  [[3,'1K'],[6,'1M'],[9,'1B'],[12,'1T'],[15,'1Qa'],[18,'1Qi'],[21,'1Sx']].forEach(([e,n])=>
+    ACHS.push({id:'earn'+e,ico:'🪙',name:'Earn '+n+' ₿M lifetime',shards:e>=12?2:1,chk:g=>g.chains[0].lifetime.gte(new D(1,e))}));
+  [[100,'Tap Novice'],[1000,'Tap Officer'],[10000,'Tap Deity']].forEach(([t,n])=>
+    ACHS.push({id:'tap'+t,ico:'👆',name:n+' — '+fmtInt(t)+' taps',shards:1,chk:g=>g.tapsTotal>=t}));
+  [[3,'First Friends'],[6,'Growing Guild'],[10,'Full Roster']].forEach(([t,n])=>
+    ACHS.push({id:'mgr'+t,ico:'👧',name:n+' — hire '+t+' Operators',shards:t>=10?3:1,chk:g=>g.chains[0].rigs.filter(r=>r.mgr).length>=t}));
+  [[10,'Button Masher'],[100,'Combo Artist'],[500,'Ability Addict']].forEach(([t,n])=>
+    ACHS.push({id:'ab'+t,ico:'✨',name:n+' — '+t+' abilities used',shards:1,chk:g=>g.counters.abilTotal>=t}));
+  [[1,'Diamond Hands'],[3,'Triple Rebirth'],[5,'Serial Resetter'],[10,'HODL Bodhisattva']].forEach(([t,n])=>
+    ACHS.push({id:'pr'+t,ico:'💎',name:n+' — prestige ×'+t,shards:t>=5?3:2,chk:g=>g.chains[0].prestiges>=t}));
+  [[1e3,'Spark Spender'],[1e4,'Grid Guzzler'],[1e5,'Blackout Baron']].forEach(([t,n])=>
+    ACHS.push({id:'en'+t,ico:'⚡',name:n+' — spend '+fmtInt(t)+' ⚡',shards:1,chk:g=>g.counters.energyTotal>=t}));
+  [[1,'First Fit'],[3,'Wardrobe'],[6,'Fashion Icon']].forEach(([t,n])=>
+    ACHS.push({id:'sk'+t,ico:'👘',name:n+' — own '+t+' skins',shards:1,chk:g=>Object.keys(g.skins).length>=t}));
+  [[50,'Sub Tinkerer'],[200,'Sub Surgeon'],[500,'Bottleneck Slayer']].forEach(([t,n])=>
+    ACHS.push({id:'su'+t,ico:'🔧',name:n+' — '+t+' sub-stage upgrades',shards:1,chk:g=>g.counters.subTotal>=t}));
+})();
+
+/* ============================================================
+   SECTION: GAME DATA — PUMP EVENTS (simulated live schedule)
+   120h cycle, first 60h active. Deterministic from epoch time.
+   ============================================================ */
+const EV_CYCLE=120*3600*1000, EV_LEN=60*3600*1000;
+const EV_THEMES=[
+ {coin:'DogeMoon',sym:'DGM',ico:'🐶',name:'DogeMoon Mega Pump'},
+ {coin:'CatCoin',sym:'CTC',ico:'🐱',name:'CatCoin Claw-back Rally'},
+ {coin:'PepeYen',sym:'PPY',ico:'🐸',name:'PepeYen Green Candle Party'},
+];
+const EV_TRACK=[
+ {at:50,rew:{gems:5},txt:'5 💠'},
+ {at:250,rew:{shards:1},txt:'1 🔬'},
+ {at:1000,rew:{gems:10},txt:'10 💠'},
+ {at:5000,rew:{shards:2},txt:'2 🔬'},
+ {at:20000,rew:{skin:'bunny',gems:25},txt:'Bull-Run Bunny Suit 🐰'},
+];
+function eventInfo(now){
+  const id=Math.floor(now/EV_CYCLE), start=id*EV_CYCLE;
+  return {id,active:(now-start)<EV_LEN,endsAt:start+EV_LEN,nextAt:start+EV_CYCLE,
+          theme:EV_THEMES[((id%EV_THEMES.length)+EV_THEMES.length)%EV_THEMES.length]};
+}
+
+/* ============================================================
+   SECTION: ART — inline SVG generators (rigs + chibi operators)
+   ============================================================ */
+function rigSVG(ico){
+  const S={
+  laptop:`<g><rect x="8" y="14" width="34" height="22" rx="3" fill="#3a4384" stroke="#6fa8ff"/><rect x="11" y="17" width="28" height="14" rx="2" fill="#0e1330"/><text x="25" y="28" font-size="9" text-anchor="middle" fill="#3df0b8">₿</text><path d="M4 38 L46 38 L42 44 L8 44 Z" fill="#525db3"/><circle cx="47" cy="14" r="4" fill="#ffd75e" opacity=".85"/></g>`,
+  gpu:`<g><rect x="6" y="16" width="38" height="18" rx="3" fill="#2c9e77" stroke="#3df0b8"/><circle cx="18" cy="25" r="6" fill="#0e1330" stroke="#8ffce0"/><path d="M18 20 L20 25 L18 30 L16 25 Z" fill="#3df0b8"/><circle cx="33" cy="25" r="6" fill="#0e1330" stroke="#8ffce0"/><path d="M33 20 L35 25 L33 30 L31 25 Z" fill="#3df0b8"/><rect x="8" y="36" width="26" height="4" rx="2" fill="#ffd75e"/></g>`,
+  rack:`<g><rect x="12" y="4" width="26" height="42" rx="4" fill="#333d7d" stroke="#6fa8ff"/><rect x="15" y="8" width="20" height="7" rx="2" fill="#0e1330"/><circle cx="31" cy="11" r="1.6" fill="#3df0b8"/><rect x="15" y="18" width="20" height="7" rx="2" fill="#0e1330"/><circle cx="31" cy="21" r="1.6" fill="#ff6fb5"/><rect x="15" y="28" width="20" height="7" rx="2" fill="#0e1330"/><circle cx="31" cy="31" r="1.6" fill="#ffd75e"/><rect x="15" y="38" width="20" height="5" rx="2" fill="#0e1330"/></g>`,
+  chip:`<g><rect x="13" y="13" width="24" height="24" rx="4" fill="#4a3f96" stroke="#b48cff"/><rect x="19" y="19" width="12" height="12" rx="2" fill="#0e1330"/><text x="25" y="28.5" font-size="8" text-anchor="middle" fill="#ffd75e">⚡</text>${[16,22,28,34].map(x=>`<rect x="${x}" y="7" width="2.6" height="6" fill="#b48cff"/><rect x="${x}" y="37" width="2.6" height="6" fill="#b48cff"/><rect x="7" y="${x}" width="6" height="2.6" fill="#b48cff"/><rect x="37" y="${x}" width="6" height="2.6" fill="#b48cff"/>`).join('')}</g>`,
+  box:`<g><rect x="6" y="14" width="38" height="24" rx="3" fill="#a4246a" stroke="#ff6fb5"/><path d="M6 20 H44 M13 14 V38 M37 14 V38" stroke="#ff9dce" fill="none" opacity=".7"/><rect x="20" y="24" width="10" height="8" rx="1.5" fill="#0e1330"/><circle cx="25" cy="28" r="2" fill="#3df0b8"/><path d="M10 14 L14 8 H36 L40 14" fill="#c94f8c"/></g>`,
+  solar:`<g><circle cx="40" cy="10" r="6" fill="#ffd75e"/><g stroke="#ffd75e" stroke-width="1.5"><path d="M40 1 V4 M49 10 H46 M46.5 3.5 L44.5 5.5 M33.5 3.5 L35.5 5.5"/></g><path d="M6 34 L16 20 H36 L26 34 Z" fill="#2b5cc4" stroke="#8fd3ff"/><path d="M10.5 30 L29 30 M13.5 26 L32 26 M16.5 22 L34 22 M21 20 L13 34 M28 20 L20 34" stroke="#8fd3ff" stroke-width="1" opacity=".8"/><rect x="14" y="34" width="18" height="4" rx="2" fill="#525db3"/></g>`,
+  volcano:`<g><path d="M10 42 L20 14 H30 L40 42 Z" fill="#6e3b52" stroke="#ff8d6f"/><path d="M20 14 Q25 18 30 14 L28 24 Q25 27 22 24 Z" fill="#ff6f4d"/><circle cx="25" cy="10" r="3.4" fill="#ffd75e"/><circle cx="19" cy="7" r="2" fill="#ff9d6f"/><circle cx="31" cy="6" r="1.7" fill="#ff9d6f"/><rect x="20" y="30" width="10" height="8" rx="2" fill="#0e1330" stroke="#3df0b8"/><circle cx="25" cy="34" r="1.8" fill="#3df0b8"/></g>`,
+  sub:`<g><path d="M4 26 Q10 14 25 14 Q40 14 46 26 Q40 38 25 38 Q10 38 4 26 Z" fill="#1f5f8a" stroke="#8fd3ff"/><circle cx="18" cy="26" r="4.4" fill="#0e1330" stroke="#8ffce0"/><circle cx="30" cy="26" r="4.4" fill="#0e1330" stroke="#8ffce0"/><circle cx="18" cy="26" r="1.6" fill="#3df0b8"/><circle cx="30" cy="26" r="1.6" fill="#3df0b8"/><rect x="22" y="7" width="6" height="8" rx="2" fill="#2b7cb4"/><circle cx="8" cy="12" r="1.6" fill="#8fd3ff" opacity=".8"/><circle cx="12" cy="6" r="1.2" fill="#8fd3ff" opacity=".6"/></g>`,
+  sat:`<g><rect x="19" y="17" width="12" height="16" rx="3" fill="#525db3" stroke="#b48cff"/><rect x="3" y="21" width="13" height="8" rx="1.6" fill="#2b5cc4" stroke="#8fd3ff"/><rect x="34" y="21" width="13" height="8" rx="1.6" fill="#2b5cc4" stroke="#8fd3ff"/><path d="M7 25 H12 M38 25 H43" stroke="#8fd3ff"/><circle cx="25" cy="25" r="3.4" fill="#0e1330"/><circle cx="25" cy="25" r="1.4" fill="#ffd75e"/><path d="M25 33 L25 40 M21 44 L25 40 L29 44" stroke="#ffd75e" fill="none"/><circle cx="25" cy="10" r="2.4" fill="#ff6fb5"/><path d="M20 12 Q25 6 30 12" stroke="#ff6fb5" fill="none" opacity=".7"/></g>`,
+  dyson:`<g><circle cx="25" cy="25" r="9" fill="#ffd75e"/><circle cx="25" cy="25" r="12.5" fill="none" stroke="#ff6fb5" stroke-width="2" stroke-dasharray="6 5"/><ellipse cx="25" cy="25" rx="20" ry="7" fill="none" stroke="#3df0b8" stroke-width="1.6"/><circle cx="45" cy="25" r="2.4" fill="#3df0b8"/><circle cx="8" cy="22" r="1.6" fill="#8fd3ff"/><circle cx="25" cy="25" r="4.5" fill="#fff6d8"/></g>`,
+  meme:`<g><circle cx="25" cy="25" r="16" fill="#f5b93a" stroke="#ffe089" stroke-width="2"/><text x="25" y="31" font-size="16" text-anchor="middle" fill="#6e3b12">🚀</text><path d="M8 8 L12 12 M42 8 L38 12 M25 2 V7" stroke="#ffd75e" stroke-width="2"/></g>`,
+  };
+  return `<svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">${S[ico]||S.laptop}</svg>`;
+}
+
+/* Chibi operator: big head, sparkly eyes, blush, tiny body. */
+function chibiSVG(art,cls){
+  const hc=art.hc,cc=art.cc,skin='#ffe3d0';
+  let hair='',acc='',mouth='';
+  switch(art.hair){
+    case 'twin':hair=`<circle cx="25" cy="20" r="15" fill="${hc}"/><path d="M10 22 Q4 30 7 40 Q12 36 13 28 Z" fill="${hc}"/><path d="M40 22 Q46 30 43 40 Q38 36 37 28 Z" fill="${hc}"/><circle cx="10.5" cy="21" r="3" fill="#ff4fa0"/><circle cx="39.5" cy="21" r="3" fill="#ff4fa0"/>`;break;
+    case 'bob':hair=`<circle cx="25" cy="20" r="15" fill="${hc}"/><path d="M10 20 Q10 34 15 36 L15 24 Z" fill="${hc}"/><path d="M40 20 Q40 34 35 36 L35 24 Z" fill="${hc}"/>`;break;
+    case 'spiky':hair=`<circle cx="25" cy="20" r="15" fill="${hc}"/><path d="M12 12 L15 4 L19 10 L25 2 L31 10 L35 4 L38 12 Z" fill="${hc}"/>`;break;
+    case 'long':hair=`<circle cx="25" cy="20" r="15" fill="${hc}"/><path d="M10 20 Q6 40 12 52 L20 48 L18 30 Z" fill="${hc}"/><path d="M40 20 Q44 40 38 52 L30 48 L32 30 Z" fill="${hc}"/>`;break;
+    case 'hood':hair=`<circle cx="25" cy="20" r="16" fill="${cc}" stroke="${hc}" stroke-width="1.5"/><circle cx="25" cy="21" r="11.5" fill="${skin}"/>`;break;
+    case 'ears':hair=`<circle cx="25" cy="20" r="15" fill="${hc}"/><path d="M11 12 L8 2 L19 7 Z" fill="${hc}"/><path d="M39 12 L42 2 L31 7 Z" fill="${hc}"/><path d="M12.5 9 L11 4 L16 6.5 Z" fill="#ffb7d9"/><path d="M37.5 9 L39 4 L34 6.5 Z" fill="#ffb7d9"/>`;break;
+    case 'bot':hair=`<rect x="10" y="6" width="30" height="28" rx="10" fill="${hc}"/><circle cx="25" cy="3" r="2.4" fill="#ff6fb5"/><line x1="25" y1="5" x2="25" y2="8" stroke="#ff6fb5" stroke-width="1.6"/>`;break;
+  }
+  if(art.hair!=='hood'&&art.hair!=='bot')hair+=`<circle cx="25" cy="22" r="11.5" fill="${skin}"/><path d="M14 16 Q18 10 25 10 Q32 10 36 16 L36 20 Q30 15 25 15 Q20 15 14 20 Z" fill="${hc}"/>`;
+  if(art.hair==='bot')hair+=`<rect x="14" y="12" width="22" height="18" rx="8" fill="${skin}"/>`;
+  switch(art.mouth){
+    case 'cat':mouth=`<path d="M22 27.5 Q23.5 29.5 25 27.5 Q26.5 29.5 28 27.5" stroke="#c2547f" fill="none" stroke-width="1.2" stroke-linecap="round"/>`;break;
+    case 'v':mouth=`<path d="M22.5 27.5 L25 29.5 L27.5 27.5" stroke="#c2547f" fill="none" stroke-width="1.2" stroke-linecap="round"/>`;break;
+    case 'sleepy':mouth=`<ellipse cx="25" cy="28.5" rx="1.8" ry="1.2" fill="#c2547f"/>`;break;
+    case 'flat':mouth=`<path d="M22.5 28.2 H27.5" stroke="#c2547f" stroke-width="1.2" stroke-linecap="round"/>`;break;
+    default:mouth=`<path d="M21.5 27 Q25 30.5 28.5 27" stroke="#c2547f" fill="none" stroke-width="1.3" stroke-linecap="round"/>`;
+  }
+  const sleepyEyes=art.mouth==='sleepy';
+  const eyes=sleepyEyes
+    ?`<path d="M17 22.5 Q19.5 24.5 22 22.5 M28 22.5 Q30.5 24.5 33 22.5" stroke="#20264f" stroke-width="1.6" fill="none" stroke-linecap="round"/>`
+    :`<ellipse cx="19.5" cy="22" rx="2.6" ry="3.4" fill="#20264f"/><ellipse cx="30.5" cy="22" rx="2.6" ry="3.4" fill="#20264f"/><circle cx="20.3" cy="20.8" r="1" fill="#fff"/><circle cx="31.3" cy="20.8" r="1" fill="#fff"/><circle cx="18.9" cy="23" r=".5" fill="#fff" opacity=".8"/><circle cx="29.9" cy="23" r=".5" fill="#fff" opacity=".8"/>`;
+  switch(art.acc){
+    case 'pickaxe':acc=`<g transform="rotate(-25 41 38)"><rect x="40" y="30" width="2.4" height="14" rx="1" fill="#8a6f4d"/><path d="M35 30 Q41 26 47 30 L47 32 Q41 29 35 32 Z" fill="#9aa3b5"/></g>`;break;
+    case 'glasses':acc=`<circle cx="19.5" cy="22" r="4.6" fill="none" stroke="#eef2ff" stroke-width="1.2"/><circle cx="30.5" cy="22" r="4.6" fill="none" stroke="#eef2ff" stroke-width="1.2"/><path d="M24 22 H26" stroke="#eef2ff" stroke-width="1.2"/>`;break;
+    case 'headset':acc=`<path d="M13 20 Q13 9 25 9 Q37 9 37 20" fill="none" stroke="#ffd75e" stroke-width="2"/><rect x="11" y="18" width="4" height="7" rx="2" fill="#ffd75e"/><rect x="35" y="18" width="4" height="7" rx="2" fill="#ffd75e"/>`;break;
+    case 'whale':acc=`<path d="M33 36 Q39 32 41 36 Q43 33 45 36 Q45 41 39 41 Q34 41 33 36 Z" fill="#8fd3ff"/><circle cx="38" cy="37.5" r=".8" fill="#20264f"/>`;break;
+    case 'crown':acc=`<path d="M17 8 L20 3 L25 7 L30 3 L33 8 Z" fill="#ffd75e" stroke="#ffe9a8"/>`;break;
+    case 'wrench':acc=`<g transform="rotate(30 40 36)"><rect x="39" y="30" width="2.2" height="11" rx="1" fill="#9aa3b5"/><circle cx="40" cy="29" r="3" fill="none" stroke="#9aa3b5" stroke-width="2"/></g>`;break;
+    case 'sun':acc=`<circle cx="41" cy="10" r="3.4" fill="#ffd75e"/><g stroke="#ffd75e"><path d="M41 4.5 V6 M41 14 V15.5 M35.5 10 H37 M45 10 H46.5"/></g>`;break;
+    case 'helmet':acc=`<path d="M14 14 Q14 6 25 6 Q36 6 36 14 L36 16 H14 Z" fill="#ffd75e"/><rect x="22" y="4" width="6" height="4" rx="2" fill="#ffd75e"/>`;break;
+    case 'box':acc=`<rect x="34" y="33" width="10" height="8" rx="1.5" fill="#b48a5a" stroke="#8a6f4d"/><path d="M34 36.5 H44" stroke="#8a6f4d"/>`;break;
+    case 'petal':acc=`<circle cx="12" cy="10" r="2" fill="#ffb7d9"/><circle cx="40" cy="6" r="1.6" fill="#ffb7d9"/><circle cx="44" cy="16" r="1.3" fill="#ffb7d9"/>`;break;
+    case 'visor':acc=`<rect x="13.5" y="18.5" width="23" height="6.5" rx="3" fill="#3df0b8" opacity=".75"/>`;break;
+    case 'float':acc=`<circle cx="25" cy="41" r="8" fill="none" stroke="#ff6fb5" stroke-width="3" stroke-dasharray="5 3"/>`;break;
+    case 'bunny':acc=`<path d="M15 8 Q13 -4 20 1 Q22 4 19 9 Z" fill="${cc}"/><path d="M35 8 Q37 -4 30 1 Q28 4 31 9 Z" fill="${cc}"/>`;break;
+  }
+  const body=`<path d="M17 34 Q25 30 33 34 L35 46 Q25 50 15 46 Z" fill="${cc}"/><circle cx="25" cy="38" r="1.4" fill="rgba(255,255,255,.5)"/>`;
+  return `<svg class="chibi ${cls||''}" viewBox="0 0 50 52" xmlns="http://www.w3.org/2000/svg">${body}${hair}
+  <ellipse cx="16.5" cy="25.5" rx="2.2" ry="1.4" fill="#ffb7c9" opacity=".85"/><ellipse cx="33.5" cy="25.5" rx="2.2" ry="1.4" fill="#ffb7c9" opacity=".85"/>
+  ${eyes}${mouth}${acc}</svg>`;
+}
+</script>
+<script>
+/* ============================================================
+   SECTION: STATE
+   ============================================================ */
+const SAVE_KEY='cryptomiko_save_v1', SAVE_VERSION=1;
+let g=null;            // the one global game state
+let sessionStart=Date.now();
+
+function newRig(){return {cnt:0,hash:0,bw:0,wal:0,mgr:false,acct:false,prog:0,run:false};}
+function newChainState(idx){
+  return {coins:D0(),lifetime:D0(),dh:0,dhClaimed:0,prestiges:0,
+    dhShop:{},rigs:CHAINS[idx].rigs.map(()=>newRig())};
+}
+function dayKey(){return new Date().toDateString();}
+function freshState(){
+  const s={
+    saveVersion:SAVE_VERSION,
+    created:Date.now(),lastSaved:Date.now(),
+    energy:50,tapsTotal:0,gems:0,shards:0,
+    buyAmt:'1',
+    settings:{music:0.4,sfx:0.7,muted:false},
+    research:{},skins:{},equip:{},
+    counters:{day:dayKey(),tapsToday:0,energyToday:0,abilToday:0,rigsToday:0,subToday:0,hireToday:0,
+              abilTotal:0,energyTotal:0,subTotal:0},
+    dailyClaimed:{},msClaimed:{},achDone:{},
+    buffs:[],cooldowns:{},
+    chains:[newChainState(0),null,null,null,null],
+    active:0,
+    event:{id:-1,cur:0,rig:0,claimed:{},pump:null,pumpCd:0},
+    sprint:{endsAt:0,cdUntil:0,base:0,startLife:null,best:0,runs:0},
+    seenWelcome:false,
+  };
+  // Design fix #3: brand-new players never lose offline earnings —
+  // Miko-chan comes free, pre-assigned to the first rig.
+  s.chains[0].rigs[0].cnt=1;
+  s.chains[0].rigs[0].mgr=true;
+  s.chains[0].rigs[0].prog=CHAINS[0].rigs[0].cyc; // first tap is instantly ready
+  return s;
+}
+
+/* ============================================================
+   SECTION: SAVE / LOAD / MIGRATION / EXPORT
+   ============================================================ */
+function reviveState(s){
+  // Rebuild Dec instances from plain {m,e} objects
+  s.chains.forEach((ch,i)=>{ if(!ch)return;
+    ch.coins=D.from(ch.coins); ch.lifetime=D.from(ch.lifetime);
+  });
+  if(s.sprint&&s.sprint.startLife)s.sprint.startLife=D.from(s.sprint.startLife);
+  return s;
+}
+function migrateSave(s){
+  // Best-effort forward migration — never silently discard a parseable save.
+  if(!s.saveVersion)s.saveVersion=1;
+  /* future: if(s.saveVersion===1){ ...transform... s.saveVersion=2; } */
+  const f=freshState();
+  for(const k of Object.keys(f))if(s[k]===undefined)s[k]=f[k];
+  for(const k of Object.keys(f.counters))if(s.counters[k]===undefined)s.counters[k]=f.counters[k];
+  if(!s.chains[0])s.chains[0]=newChainState(0);
+  while(s.chains[0].rigs.length<CHAINS[0].rigs.length)s.chains[0].rigs.push(newRig());
+  s.chains[0].rigs.forEach((r,i)=>{const n=newRig();for(const k of Object.keys(n))if(r[k]===undefined)r[k]=n[k];});
+  return s;
+}
+let saveTimer=0, dirtySave=false;
+function save(){
+  if(!g)return;
+  g.lastSaved=Date.now();
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify(g));}catch(e){/* storage full/blocked */}
+  dirtySave=false;
+}
+function queueSave(){dirtySave=true;}
+function load(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return null;
+    const s=JSON.parse(raw);
+    return reviveState(migrateSave(s));
+  }catch(e){console.warn('Save could not be parsed — starting fresh, old save preserved under _backup',e);
+    try{localStorage.setItem(SAVE_KEY+'_backup',localStorage.getItem(SAVE_KEY));}catch(_){}
+    return null;
+  }
+}
+function exportSave(){
+  save();
+  return btoa(unescape(encodeURIComponent(JSON.stringify(g))));
+}
+function importSave(str){
+  try{
+    const s=JSON.parse(decodeURIComponent(escape(atob(str.trim()))));
+    if(!s||typeof s!=='object'||!s.chains)throw new Error('bad save');
+    g=reviveState(migrateSave(s));
+    save();
+    location.reload();
+    return true;
+  }catch(e){return false;}
+}
+
+/* ============================================================
+   SECTION: DERIVED STATS (multipliers, energy, offline cap)
+   ============================================================ */
+function researchSum(field){let v=0;for(const r of RESEARCH)if(g.research[r.id]&&r[field])v+=r[field];return v;}
+function researchMax(field){let v=0;for(const r of RESEARCH)if(g.research[r.id]&&r[field])v=Math.max(v,r[field]);return v;}
+function dhShopLvlC(c,id){const ch=g.chains[c];return (ch&&ch.dhShop[id])||0;}
+function dhShopSum(id){let v=0;for(const ch of g.chains)if(ch)v+=ch.dhShop[id]||0;return v;}
+function energyCap(){return 150+researchSum('cap')+dhShopSum('battery')*250;}
+function energyRegen(){return 1+researchSum('regen')+dhShopSum('regen')*0.5;}
+function offlineCapH(){return Math.max(2,researchMax('off'));}
+function cdrMult(){return Math.max(0.3,1-Math.min(0.6,researchSum('cdr')));}
+function buffDurMult(){return 1+researchSum('dur');}
+function globalBuffMult(){
+  let m=1;const now=Date.now();
+  for(const b of g.buffs)if(b.r===null&&b.until>now)m*=b.mult;
+  return m;
+}
+function rigBuffMult(c,r){
+  let m=1;const now=Date.now();
+  for(const b of g.buffs)if(b.c===c&&b.r===r&&b.until>now)m*=b.mult;
+  return m;
+}
+function skinBonus(c,i){
+  if(c!==0)return 0;
+  let b=0;
+  for(const sk of SKINS)if(g.skins[sk.id]&&sk.mgr===i)b+=sk.bonus;
+  return b;
+}
+function chainMult(c){
+  const ch=g.chains[c];
+  return (1+0.02*ch.dh)                       // Diamond Hands: +2% each, forever
+       * (1+researchSum('profit'))            // Blockchain Lab
+       * Math.pow(1.25,dhShopLvlC(c,'pickaxe'))  // Golden Pickaxe stacks
+       * globalBuffMult();                    // Whale Splash / Pump buffs
+}
+
+/* ============================================================
+   SECTION: PRODUCTION MATH (3-stage bottleneck inside)
+   payout = min( Hash-boosted profit , Cold-Wallet capacity )
+   cycle  = base / Bandwidth speed-ups (floored at 0.3s)
+   ============================================================ */
+function rigDef(c,i){return CHAINS[c].rigs[i];}
+function hashF(r){return 1+0.10*r.hash;}
+function walF(r){return 1+0.25*r.wal;}
+function bwF(r){return 1+0.08*r.bw;}
+function cycleTime(c,i){const r=g.chains[c].rigs[i];return Math.max(CYCLE_FLOOR,rigDef(c,i).cyc/bwF(r));}
+function rigBaseFactor(c,i){ // shared factor for profit & wallet cap
+  const r=g.chains[c].rigs[i];
+  return D.from(rigDef(c,i).p).mul(r.cnt).mul(msMult(r.cnt)).mul(chainMult(c)).mul(1+skinBonus(c,i)).mul(rigBuffMult(c,i));
+}
+function rigCycleProfit(c,i){ // what actually pays: min(hash, wallet)
+  const r=g.chains[c].rigs[i];
+  const base=rigBaseFactor(c,i);
+  const prof=base.mul(hashF(r)), cap=base.mul(walF(r));
+  return prof.lte(cap)?prof:cap;
+}
+function rigRate(c,i){ // per second (managed)
+  return rigCycleProfit(c,i).div(cycleTime(c,i));
+}
+function bottleneck(c,i){
+  // per-stage status: g green / y yellow (weakest) / r red (wallet is clamping payouts)
+  const r=g.chains[c].rigs[i];
+  const clamped=hashF(r)>walF(r)+1e-9;
+  const sc={hash:0.10*r.hash,bw:0.08*r.bw,wal:0.25*r.wal};
+  let low='hash';
+  for(const k of ['bw','wal'])if(sc[k]<sc[low]-1e-9)low=k;
+  const spread=Math.max(sc.hash,sc.bw,sc.wal)-Math.min(sc.hash,sc.bw,sc.wal);
+  const st={hash:'g',bw:'g',wal:'g'};
+  if(spread>0.15)st[low]='y';
+  if(clamped)st.wal='r';
+  // "all green" for milestone purposes needs real investment, not three zeros
+  return {st,low,clamped,all:!clamped&&spread<=0.3&&(r.hash+r.bw+r.wal)>=9};
+}
+function totalRate(c){
+  let t=D0();
+  const ch=g.chains[c];
+  ch.rigs.forEach((r,i)=>{if(r.cnt>0&&r.mgr)t=t.add(rigRate(c,i));});
+  return t;
+}
+function totalRigs(c){return g.chains[c].rigs.reduce((a,r)=>a+r.cnt,0);}
+
+/* ============================================================
+   SECTION: EARNING / SPENDING
+   ============================================================ */
+function addCoins(c,d){
+  const ch=g.chains[c];
+  ch.coins=ch.coins.add(d);
+  ch.lifetime=ch.lifetime.add(d);
+}
+function spendCoins(c,d){
+  const ch=g.chains[c];
+  if(ch.coins.lt(d))return false;
+  ch.coins=ch.coins.sub(d);
+  return true;
+}
+
+/* Rig unit purchases — cost ENERGY (AdVenture-Communist style) */
+function rigUnitCost(c,i,n){ // cost of unit #n (0-indexed)
+  const acct=g.chains[c].rigs[i].acct?0.9:1;
+  return rigDef(c,i).e*Math.pow(RIG_GROWTH,n)*acct;
+}
+function rigBulkCost(c,i,k){ // buy k units starting from current count
+  const n=g.chains[c].rigs[i].cnt;
+  const base=rigUnitCost(c,i,n);
+  return base*(Math.pow(RIG_GROWTH,k)-1)/(RIG_GROWTH-1);
+}
+function maxAffordable(c,i){
+  const n=g.chains[c].rigs[i].cnt;
+  const base=rigUnitCost(c,i,n);
+  if(g.energy<base)return 0;
+  const k=Math.floor(Math.log(g.energy*(RIG_GROWTH-1)/base+1)/Math.log(RIG_GROWTH));
+  return Math.max(0,k);
+}
+function buyAmount(c,i){
+  if(g.buyAmt==='max')return Math.max(1,maxAffordable(c,i));
+  return parseInt(g.buyAmt,10);
+}
+function buyRig(c,i){
+  const k=g.buyAmt==='max'?maxAffordable(c,i):parseInt(g.buyAmt,10);
+  if(k<=0)return false;
+  const cost=rigBulkCost(c,i,k);
+  if(g.energy<cost)return false;
+  const r=g.chains[c].rigs[i];
+  const before=r.cnt;
+  g.energy-=cost;
+  g.counters.energyToday+=cost;g.counters.energyTotal+=cost;
+  r.cnt+=k;
+  g.counters.rigsToday+=k;
+  if(before===0)r.prog=cycleTime(c,i); // fresh rig starts ready to tap
+  const crossed=prevMs(r.cnt)>prevMs(before);
+  queueSave();
+  return {k,cost,crossed};
+}
+
+/* Sub-stage upgrades — cost CHAIN COIN */
+function subCost(c,i,stage){
+  const r=g.chains[c].rigs[i], lv=r[stage];
+  const mult={hash:3,bw:4,wal:2.5}[stage];
+  return D.from(rigDef(c,i).p).mul(mult).mul(D.from(SUB_GROWTH).pow(lv)).mul(Math.max(1,r.cnt*0.12));
+}
+function buySub(c,i,stage){
+  const cost=subCost(c,i,stage);
+  if(!spendCoins(c,cost))return false;
+  g.chains[c].rigs[i][stage]++;
+  g.counters.subToday++;g.counters.subTotal++;
+  queueSave();
+  return true;
+}
+
+/* Operators — hired with CHAIN COIN */
+function hireMgr(c,i){
+  const r=g.chains[c].rigs[i];
+  if(r.mgr)return false;
+  const cost=D.from(mgrDef(c,i).cost);
+  if(!spendCoins(c,cost))return false;
+  r.mgr=true;g.counters.hireToday++;
+  queueSave();
+  return true;
+}
+/* Whale Accountant — costs Diamond Hands, wiped on prestige (AdCap rule) */
+function acctCost(i){return 2+i;}
+function buyAcct(c,i){
+  const r=g.chains[c].rigs[i];
+  if(!r.mgr||r.acct)return false;
+  const ch=g.chains[c], cost=acctCost(i);
+  if(ch.dh<cost)return false;
+  ch.dh-=cost;r.acct=true;g.counters.hireToday++;
+  queueSave();
+  return true;
+}
+
+/* Abilities */
+function mgrKey(c,i){return c+':'+i;}
+function abilReady(c,i){return (g.cooldowns[mgrKey(c,i)]||0)<=Date.now();}
+function abilCdLeft(c,i){return Math.max(0,((g.cooldowns[mgrKey(c,i)]||0)-Date.now())/1000);}
+function useAbility(c,i){
+  const r=g.chains[c].rigs[i];
+  if(!r.mgr||!abilReady(c,i))return false;
+  const a=mgrDef(c,i).abil;
+  const dur=a.dur*buffDurMult()*1000;
+  g.buffs.push({c,r:a.global?null:i,mult:a.mult,until:Date.now()+dur,name:a.name});
+  g.cooldowns[mgrKey(c,i)]=Date.now()+a.cd*cdrMult()*1000;
+  g.counters.abilToday++;g.counters.abilTotal++;
+  queueSave();
+  return true;
+}
+function pruneBuffs(){const now=Date.now();g.buffs=g.buffs.filter(b=>b.until>now);}
+
+/* ============================================================
+   SECTION: PRESTIGE — DIAMOND HANDS
+   dh = sqrt(lifetime/K) − sqrt(previouslyClaimedLifetime/K)
+   ============================================================ */
+function dhTotalFor(c,life){return Math.floor(life.div(CHAINS[c].K).sqrt().num()*(1+0.1*dhShopLvlC(c,'magnet')));}
+function dhGainAvailable(c){
+  const ch=g.chains[c];
+  return Math.max(0,dhTotalFor(c,ch.lifetime)-ch.dhClaimed);
+}
+function nextDhAt(c){ // lifetime needed for next +1 DH
+  const ch=g.chains[c];
+  const nxt=(ch.dhClaimed+dhGainAvailable(c)+1)/(1+0.1*dhShopLvlC(c,'magnet'));
+  return D.from(nxt).mul(nxt).mul(CHAINS[c].K);
+}
+function doPrestige(c){
+  const gain=dhGainAvailable(c);
+  if(gain<=0)return false;
+  const ch=g.chains[c];
+  ch.dh+=gain;
+  ch.dhClaimed+=gain;
+  ch.prestiges++;
+  ch.coins=D0();
+  ch.rigs=CHAINS[c].rigs.map(()=>newRig());
+  // wiped: rig levels, managers, accountants. kept: dh, research, skins, achievements.
+  ch.rigs[0].cnt=1+dhShopLvlC(c,'headstart')*10;
+  ch.rigs[0].mgr=true; // Miko-chan is forever your friend
+  ch.rigs[0].prog=CHAINS[c].rigs[0].cyc;
+  g.buffs=g.buffs.filter(b=>b.c!==c);
+  for(const k of Object.keys(g.cooldowns))if(k.startsWith(c+':'))delete g.cooldowns[k];
+  save();
+  return gain;
+}
+function buyDhShop(c,id){
+  const item=DH_SHOP.find(x=>x.id===id), ch=g.chains[c];
+  const lvl=dhShopLvlC(c,id);
+  if(lvl>=(item.max||99))return false;
+  const cost=Math.ceil(item.cost*Math.pow(item.scale||1,lvl));
+  if(ch.dh<cost)return false;
+  ch.dh-=cost;
+  ch.dhShop[id]=lvl+1;
+  queueSave();
+  return true;
+}
+
+/* ============================================================
+   SECTION: RESEARCH purchases
+   ============================================================ */
+function canResearch(r){return !g.research[r.id]&&(!r.req||g.research[r.req])&&g.shards>=r.cost;}
+function buyResearch(id){
+  const r=RESEARCH.find(x=>x.id===id);
+  if(!r||!canResearch(r))return false;
+  g.shards-=r.cost;g.research[id]=true;
+  queueSave();
+  return true;
+}
+
+/* ============================================================
+   SECTION: OFFLINE EARNINGS
+   Only managed rigs earn. Capped (2h base → 24h researched).
+   ============================================================ */
+function computeOffline(elapsedSec){
+  const cap=offlineCapH()*3600;
+  const t=Math.min(elapsedSec,cap);
+  const res={t,total:D0(),perChain:[]};
+  g.chains.forEach((ch,c)=>{
+    if(!ch)return;
+    let sum=D0();
+    ch.rigs.forEach((r,i)=>{ if(r.cnt>0&&r.mgr)sum=sum.add(rigRate(c,i).mul(t)); });
+    if(!sum.isZero()){addCoins(c,sum);res.perChain.push({c,sum});res.total=res.total.add(sum);}
+  });
+  // Energy regenerates the whole time away (up to cap)
+  g.energy=Math.min(energyCap(),g.energy+energyRegen()*elapsedSec);
+  return res;
+}
+</script>
+<script>
+/* ============================================================
+   SECTION: GAME LOOP / TICK
+   Fixed-tick simulation decoupled from render; interval fallback
+   keeps ticking while tab is backgrounded.
+   ============================================================ */
+const TICK=0.1;
+let lastFrame=performance.now(), acc=0;
+
+function tick(dt){
+  g.playSec=(g.playSec||0)+dt;
+  // Energy regen (never above cap; reward overfills stay until spent)
+  if(g.energy<energyCap())g.energy=Math.min(energyCap(),g.energy+energyRegen()*dt);
+
+  // Rig production
+  g.chains.forEach((ch,c)=>{
+    if(!ch)return;
+    ch.rigs.forEach((r,i)=>{
+      if(r.cnt<=0)return;
+      const cyc=cycleTime(c,i);
+      if(r.mgr){
+        r.prog+=dt;
+        if(r.prog>=cyc){
+          const n=Math.floor(r.prog/cyc);
+          r.prog-=n*cyc;
+          const pay=rigCycleProfit(c,i).mul(n);
+          addCoins(c,pay);
+          onPayout(c,i,pay,n);
+        }
+      }else{
+        // unmanaged: cycle charges up, waits for a tap to collect
+        if(r.prog<cyc)r.prog=Math.min(cyc,r.prog+dt);
+      }
+    });
+  });
+
+  // Event reactor produces event-coin passively
+  const ev=eventInfo(Date.now());
+  if(ev.active&&g.event.id===ev.id&&g.event.rig>0){
+    g.event.cur+=g.event.rig*0.6*dt;
+  }
+
+  pruneBuffs();
+  checkDailyRollover();
+  checkSprintEnd();
+  ensureEvent();
+  if(g.event.pump)resolvePump();
+  checkAchievements(dt);
+
+  // Layer2 unlock — a whole new parallel economy goes live
+  if(!g.chains[1]&&CHAINS[1].rigs.length&&g.chains[0].lifetime.gte(CHAINS[1].unlockLife)){
+    g.chains[1]=newChainState(1);
+    g.chains[1].rigs[0].cnt=1;
+    g.chains[1].rigs[0].mgr=true; // Shiba-chan comes free, same as Miko-chan
+    g.chains[1].rigs[0].prog=CHAINS[1].rigs[0].cyc;
+    toast('🌙 LAYER2 CHAIN UNLOCKED! Switch over from the Chains tab!');
+    confettiBig();sfxPrestige();
+    ui.dirty.chains=true;
+    queueSave();
+  }
+
+  // autosave every 10s + when flagged dirty (min 1.5s apart)
+  saveTimer+=dt;
+  if(saveTimer>=10||(dirtySave&&saveTimer>=1.5)){saveTimer=0;save();}
+}
+
+/* payout hook → floaty numbers + operator bounce (throttled) */
+let lastFloat={};
+function onPayout(c,i,pay,n){
+  const now=performance.now();
+  if(c===act()&&ui.screen==='miners'&&rigEls[i]&&(!lastFloat[i]||now-lastFloat[i]>900)){
+    lastFloat[i]=now;
+    bounceOp(i);
+  }
+}
+
+/* Manual tap: collects a ready cycle (or fast-forwards a managed one) */
+function tapRig(c,i,x,y){
+  const r=g.chains[c].rigs[i];
+  if(r.cnt<=0)return;
+  const cyc=cycleTime(c,i);
+  g.tapsTotal++;g.counters.tapsToday++;
+  if(r.prog>=cyc||r.mgr){
+    // tap completes the current cycle instantly and pays out in full
+    const pay=rigCycleProfit(c,i);
+    addCoins(c,pay);
+    r.prog=0;
+    sfxTap();
+    floatText(x,y,'+'+fmt(pay)+' '+CHAINS[c].sym);
+    burst(x,y,6,['#ffd75e','#ff6fb5','#3df0b8']);
+    bounceOp(i);
+  }else{
+    sfxTapDud();
+  }
+}
+
+/* ============================================================
+   SECTION: DAILY TASKS / MILESTONES / ACHIEVEMENTS
+   ============================================================ */
+function mulberry(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+function todaysDailies(){
+  const days=Math.floor(Date.now()/86400000);
+  const rnd=mulberry(days*7919);
+  const pool=[...DAILY_POOL], out=[];
+  while(out.length<4&&pool.length)out.push(pool.splice(Math.floor(rnd()*pool.length),1)[0]);
+  return out;
+}
+function checkDailyRollover(){
+  if(g.counters.day!==dayKey()){
+    g.counters.day=dayKey();
+    g.counters.tapsToday=0;g.counters.energyToday=0;g.counters.abilToday=0;
+    g.counters.rigsToday=0;g.counters.subToday=0;g.counters.hireToday=0;
+    g.dailyClaimed={};
+    toast('🌸 New Daily Tasks are in!');
+    ui.dirty.tasks=true;
+    queueSave();
+  }
+}
+function grantRew(rew,src){
+  const bits=[];
+  if(rew.energy){g.energy+=rew.energy;bits.push('+'+rew.energy+' ⚡');}
+  if(rew.gems){g.gems+=rew.gems;bits.push('+'+rew.gems+' 💠');}
+  if(rew.shards){g.shards+=rew.shards;bits.push('+'+rew.shards+' 🔬');}
+  if(rew.skin&&!g.skins[rew.skin]){g.skins[rew.skin]=true;bits.push('👘 '+SKINS.find(s=>s.id===rew.skin).name);}
+  toast((src?src+' — ':'')+bits.join('  '));
+  queueSave();
+  return bits;
+}
+function claimDaily(id){
+  const t=DAILY_POOL.find(x=>x.id===id);
+  if(!t||g.dailyClaimed[id]||t.val(g)<t.t)return false;
+  g.dailyClaimed[id]=true;
+  grantRew(t.rew,'✅ '+t.name);
+  sfxMilestone();
+  return true;
+}
+function claimMilestone(id){
+  const t=MILESTONE_TASKS.find(x=>x.id===id);
+  if(!t||g.msClaimed[id]||!t.chk(g))return false;
+  g.msClaimed[id]=true;
+  grantRew(t.rew,'🏆 '+t.name);
+  sfxMilestone();confettiBig();
+  return true;
+}
+let achTimer=0;
+function checkAchievements(dt){
+  achTimer+=dt;
+  if(achTimer<1)return;achTimer=0;
+  for(const a of ACHS){
+    if(g.achDone[a.id])continue;
+    let ok=false;
+    try{ok=a.chk(g);}catch(e){}
+    if(ok){
+      g.achDone[a.id]=true;
+      g.shards+=a.shards;
+      toast('🏅 '+a.name+'  →  +'+a.shards+' 🔬');
+      sfxMilestone();
+      ui.dirty.tasks=true;ui.dirty.lab=true;
+      queueSave();
+    }
+  }
+  // skin from achievements
+  if(!g.skins.eclipse&&g.chains[0].prestiges>=3){
+    g.skins.eclipse=true;
+    toast('👘 Skin unlocked: Solar-hime Eclipse!');
+    ui.dirty.ops=true;ui.dirty.shop=true;
+    queueSave();
+  }
+}
+
+/* ============================================================
+   SECTION: PUMP EVENTS + "Pump the Chart" minigame
+   ============================================================ */
+function ensureEvent(){
+  const ev=eventInfo(Date.now());
+  if(ev.active&&g.event.id!==ev.id){
+    g.event={id:ev.id,cur:0,rig:0,claimed:{},pump:null,pumpCd:0};
+    toast('🔥 '+ev.theme.name+' is LIVE!');
+    ui.dirty.events=true;
+    queueSave();
+  }
+  return ev;
+}
+function evRigCost(){return Math.ceil(10*Math.pow(1.25,g.event.rig));}
+function buyEvRig(){
+  const c=evRigCost();
+  if(g.event.cur<c)return false;
+  g.event.cur-=c;g.event.rig++;
+  sfxBuy();queueSave();
+  return true;
+}
+function startPump(){
+  if(g.event.pump||Date.now()<g.event.pumpCd)return false;
+  g.event.pump={endsAt:Date.now()+10000,taps:0};
+  sfxAbility();
+  return true;
+}
+function pumpTap(){
+  if(!g.event.pump||Date.now()>g.event.pump.endsAt)return;
+  g.event.pump.taps++;
+  sfxTap();
+}
+function resolvePump(){
+  const p=g.event.pump;
+  if(!p||Date.now()<=p.endsAt)return;
+  const dgm=Math.round(p.taps*(2+g.event.rig*0.5));
+  g.event.cur+=dgm;
+  let msg='📈 Pump over! +'+dgm+' '+eventInfo(Date.now()).theme.sym;
+  if(p.taps>=50){
+    const mult=Math.min(10,5+Math.floor(g.event.rig/10));
+    g.buffs.push({c:0,r:null,mult,until:Date.now()+60000,name:'PUMP x'+mult});
+    msg+='  🚀 HYPE MAX: x'+mult+' ALL profit for 60s!';
+    confettiBig();sfxPrestige();
+  }
+  g.event.pump=null;
+  g.event.pumpCd=Date.now()+120000;
+  toast(msg);
+  ui.dirty.events=true;
+  queueSave();
+}
+function claimEvTrack(idx){
+  const t=EV_TRACK[idx];
+  if(g.event.claimed[idx]||g.event.cur<t.at)return false;
+  g.event.claimed[idx]=true;
+  grantRew(t.rew,'🔥 Event reward');
+  sfxMilestone();
+  return true;
+}
+
+/* ============================================================
+   SECTION: ENERGY SPRINT (puzzle-style optimization task)
+   10 minutes, earn vs. your baseline production → 1-3 stars.
+   ============================================================ */
+function startSprint(){
+  if(g.sprint.endsAt>Date.now()||Date.now()<g.sprint.cdUntil)return false;
+  g.sprint.endsAt=Date.now()+600000;
+  g.sprint.base=totalRate(0).num();
+  g.sprint.startLife=D.from(g.chains[0].lifetime);
+  toast('⏱️ Energy Sprint started — 10 minutes, go go go!');
+  sfxAbility();queueSave();
+  return true;
+}
+function checkSprintEnd(){
+  if(!g.sprint.endsAt||Date.now()<g.sprint.endsAt)return;
+  const earned=g.chains[0].lifetime.sub(g.sprint.startLife);
+  const par=Math.max(1,g.sprint.base*600);
+  const ratio=earned.div(par).num();
+  let stars=0;
+  if(ratio>=0.6)stars=1; if(ratio>=0.9)stars=2; if(ratio>=1.2)stars=3;
+  const gems=[0,5,10,20][stars];
+  g.sprint.endsAt=0;g.sprint.cdUntil=Date.now()+2*3600*1000;
+  g.sprint.best=Math.max(g.sprint.best,stars);g.sprint.runs++;
+  if(gems)grantRew({gems},'⏱️ Sprint '+'★'.repeat(stars));
+  else toast('⏱️ Sprint over — below par. Buy & boost harder next time!');
+  ui.dirty.tasks=true;
+  queueSave();
+}
+
+/* ============================================================
+   SECTION: SHOP (gems are earned in-game only — no IAP)
+   ============================================================ */
+function openChest(){
+  if(g.gems<CHEST_COST)return false;
+  g.gems-=CHEST_COST;
+  const W={common:40,rare:30,epic:20,legendary:9,mythic:1};
+  const pool=CHEST_POOL.map(s=>({s,w:W[s.rar]||10}));
+  const tot=pool.reduce((a,p)=>a+p.w,0);
+  let roll=Math.random()*tot,pick=pool[0].s;
+  for(const p of pool){roll-=p.w;if(roll<=0){pick=p.s;break;}}
+  if(g.skins[pick.id]){
+    g.gems+=10;
+    toast('👘 Duplicate '+pick.name+' → +10 💠 back');
+  }else{
+    g.skins[pick.id]=true;
+    toast('✨ NEW SKIN: '+pick.name+' (+'+Math.round(pick.bonus*100)+'% '+MGRS[pick.mgr].name+')');
+    confettiBig();sfxPrestige();
+  }
+  ui.dirty.ops=true;ui.dirty.shop=true;
+  queueSave();
+  return pick;
+}
+function buyTimeCapsule(){
+  if(g.gems<25)return false;
+  g.gems-=25;
+  const res=computeOffline(2*3600);
+  toast('⏳ Time Capsule: +'+fmt(res.total)+' ₿M (2h of production)');
+  sfxMilestone();queueSave();
+  return true;
+}
+function buyEnergyRefill(){
+  if(g.gems<10||g.energy>=energyCap())return false;
+  g.gems-=10;g.energy=energyCap();
+  toast('⚡ Energy refilled!');
+  sfxBuy();queueSave();
+  return true;
+}
+
+/* ============================================================
+   SECTION: AUDIO — Web Audio API synth (no external assets)
+   soft kawaii pops/chimes + generative lo-fi background loop
+   ============================================================ */
+const AU={ctx:null,master:null,sfx:null,music:null,started:false,tapCombo:0,lastTap:0,musTimer:null,bar:0};
+function auInit(){
+  if(AU.ctx)return;
+  try{
+    AU.ctx=new (window.AudioContext||window.webkitAudioContext)();
+    AU.master=AU.ctx.createGain();AU.master.connect(AU.ctx.destination);
+    AU.sfx=AU.ctx.createGain();AU.sfx.connect(AU.master);
+    AU.music=AU.ctx.createGain();AU.music.connect(AU.master);
+    applyVolumes();
+    startMusic();
+  }catch(e){}
+}
+function applyVolumes(){
+  if(!AU.ctx)return;
+  AU.master.gain.value=g.settings.muted?0:1;
+  AU.sfx.gain.value=g.settings.sfx;
+  AU.music.gain.value=g.settings.music*0.5;
+}
+function tone(freq,dur,type,vol,when,dest,slide){
+  if(!AU.ctx)return;
+  const t0=AU.ctx.currentTime+(when||0);
+  const o=AU.ctx.createOscillator(),gn=AU.ctx.createGain();
+  o.type=type||'sine';o.frequency.setValueAtTime(freq,t0);
+  if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(1,freq*slide),t0+dur);
+  gn.gain.setValueAtTime(0,t0);
+  gn.gain.linearRampToValueAtTime(vol,t0+0.012);
+  gn.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  o.connect(gn);gn.connect(dest||AU.sfx);
+  o.start(t0);o.stop(t0+dur+0.05);
+}
+function noiseBurst(dur,vol,when,freq){
+  if(!AU.ctx)return;
+  const t0=AU.ctx.currentTime+(when||0);
+  const len=Math.floor(AU.ctx.sampleRate*dur);
+  const buf=AU.ctx.createBuffer(1,len,AU.ctx.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);
+  const src=AU.ctx.createBufferSource();src.buffer=buf;
+  const f=AU.ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=freq||1200;f.Q.value=1.2;
+  const gn=AU.ctx.createGain();gn.gain.setValueAtTime(vol,t0);gn.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  src.connect(f);f.connect(gn);gn.connect(AU.sfx);
+  src.start(t0);
+}
+/* rising-pitch combo pop, resets after 0.8s idle */
+function sfxTap(){
+  if(!AU.ctx)return;
+  const now=performance.now();
+  AU.tapCombo=(now-AU.lastTap<800)?Math.min(AU.tapCombo+1,12):0;
+  AU.lastTap=now;
+  const f=620*Math.pow(1.035,AU.tapCombo);
+  tone(f,0.09,'sine',0.35,0,AU.sfx,1.35);
+  tone(f*2,0.05,'triangle',0.10);
+}
+function sfxTapDud(){tone(180,0.06,'sine',0.12);}
+function sfxBuy(){ // warm two-note major third, marimba-ish
+  tone(523.25,0.14,'triangle',0.32);
+  tone(659.25,0.18,'triangle',0.30,0.09);
+  tone(1046.5,0.10,'sine',0.10,0.09);
+}
+function sfxMilestone(){ // bright music-box arpeggio
+  [523.25,659.25,783.99,1046.5,1318.5].forEach((f,i)=>{
+    tone(f,0.30,'sine',0.26,i*0.07);
+    tone(f*2,0.16,'sine',0.07,i*0.07);
+  });
+}
+function sfxAbility(){
+  noiseBurst(0.25,0.20,0,2400);
+  tone(880,0.20,'sine',0.22,0.05,AU.sfx,1.5);
+  tone(1318.5,0.25,'sine',0.16,0.12);
+}
+function sfxPrestige(){
+  noiseBurst(0.7,0.22,0,600);
+  [392,523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,0.5,'triangle',0.22,0.1+i*0.09));
+}
+function sfxWelcome(){
+  [523.25,587.33,659.25,783.99].forEach((f,i)=>tone(f,0.4,'sine',0.18,i*0.13,AU.sfx,1.02));
+}
+/* generative chillhop-ish loop: soft pads + pentatonic plucks, 2 patterns */
+const MUS={prog:[[[261.63,329.63,392,493.88],[220,261.63,329.63,440],[174.61,220,261.63,349.23],[196,246.94,293.66,392]],
+                 [[220,277.18,329.63,415.3],[174.61,220,261.63,349.23],[146.83,185,220,293.66],[196,246.94,293.66,392]]],
+           pent:[261.63,293.66,329.63,392,440,523.25,587.33,659.25]};
+function startMusic(){
+  if(AU.musTimer)return;
+  let nextBar=AU.ctx.currentTime+0.1;
+  AU.musTimer=setInterval(()=>{
+    if(!AU.ctx)return;
+    if(nextBar<AU.ctx.currentTime)nextBar=AU.ctx.currentTime+0.05; // never schedule into the past
+    while(nextBar<AU.ctx.currentTime+0.6){
+      const silent=g.settings.muted||g.settings.music<=0.01;
+      if(!silent){
+        const track=Math.floor(AU.bar/16)%2;
+        const chord=MUS.prog[track][AU.bar%4];
+        const when=nextBar-AU.ctx.currentTime;
+        chord.forEach(f=>{ // pad
+          tone(f/2,1.9,'triangle',0.05,when,AU.music);
+          tone(f,1.9,'sine',0.028,when,AU.music);
+        });
+        tone(chord[0]/4,0.5,'sine',0.09,when,AU.music); // soft bass
+        for(let e=0;e<4;e++){ // sparse pluck melody
+          if(Math.random()<0.42){
+            const n=MUS.pent[Math.floor(Math.random()*MUS.pent.length)]*(track?1:2);
+            tone(n,0.22,'sine',0.05,when+e*0.5+(Math.random()<.3?0.25:0),AU.music);
+          }
+        }
+      }
+      nextBar+=2.0;AU.bar++;
+    }
+  },400);
+}
+
+/* ============================================================
+   SECTION: FX — canvas particles, confetti, floating text
+   ============================================================ */
+const fxCv=document.getElementById('fx'),fxCtx=fxCv.getContext('2d');
+let parts=[];
+function fxResize(){fxCv.width=innerWidth;fxCv.height=innerHeight;}
+addEventListener('resize',fxResize);fxResize();
+function burst(x,y,n,colors){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,v=60+Math.random()*160;
+    parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-90,life:0.7+Math.random()*0.4,age:0,
+      c:colors[i%colors.length],s:2.5+Math.random()*3.5,shape:Math.random()<0.4?'r':'c'});
+  }
+  if(parts.length>420)parts.splice(0,parts.length-420);
+}
+function confettiBig(){
+  for(let i=0;i<90;i++){
+    parts.push({x:Math.random()*fxCv.width,y:-12-Math.random()*60,
+      vx:(Math.random()-0.5)*70,vy:110+Math.random()*160,life:2.1+Math.random(),age:0,
+      c:['#ffd75e','#ff6fb5','#3df0b8','#6fa8ff','#b48cff'][i%5],s:3+Math.random()*4,shape:'r',spin:Math.random()*6});
+  }
+  document.getElementById('app').classList.remove('shakeLite');
+  void document.getElementById('app').offsetWidth;
+  document.getElementById('app').classList.add('shakeLite');
+}
+function fxStep(dt){
+  if(!parts.length){fxCtx.clearRect(0,0,fxCv.width,fxCv.height);return;}
+  fxCtx.clearRect(0,0,fxCv.width,fxCv.height);
+  parts=parts.filter(p=>{
+    p.age+=dt;if(p.age>=p.life)return false;
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=260*dt;
+    const a=1-p.age/p.life;
+    fxCtx.globalAlpha=a;fxCtx.fillStyle=p.c;
+    if(p.shape==='r'){
+      fxCtx.save();fxCtx.translate(p.x,p.y);fxCtx.rotate((p.spin||2)*p.age);
+      fxCtx.fillRect(-p.s/2,-p.s/2,p.s,p.s*1.6);fxCtx.restore();
+    }else{
+      fxCtx.beginPath();fxCtx.arc(p.x,p.y,p.s*a,0,7);fxCtx.fill();
+    }
+    return true;
+  });
+  fxCtx.globalAlpha=1;
+}
+function floatText(x,y,txt,cls){
+  const el=document.createElement('div');
+  el.className='floatTxt '+(cls||'');
+  el.textContent=txt;
+  const app=document.getElementById('app').getBoundingClientRect();
+  el.style.left=Math.max(4,Math.min(app.width-90,x-app.left-30))+'px';
+  el.style.top=(y-app.top-20)+'px';
+  document.getElementById('floats').appendChild(el);
+  setTimeout(()=>el.remove(),1050);
+}
+function toast(msg){
+  const t=document.createElement('div');
+  t.className='toast';t.textContent=msg;
+  const box=document.getElementById('toasts');
+  box.appendChild(t);
+  while(box.children.length>3)box.firstChild.remove();
+  setTimeout(()=>t.remove(),3900);
+}
+</script>
+<script>
+/* ============================================================
+   SECTION: RENDER / UI
+   ============================================================ */
+const $=id=>document.getElementById(id);
+const ui={screen:'miners',dirty:{miners:true,ops:true,tasks:true,lab:true,prestige:true,events:true,shop:true,chains:true}};
+let rigEls=[],opEls=[],taskEls={},prestigeEls={},eventEls={},hudDisp={coin:D0(),energy:0};
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function act(){return g.chains[g.active]?g.active:0;}
+function mgrArt(c,i){
+  if(c===0){ // skins are a Genesis-roster collection
+    const eq=g.equip[i];
+    if(eq&&g.skins[eq]){const sk=SKINS.find(s=>s.id===eq);if(sk)return {...MGRS[i].art,...sk.art};}
+  }
+  return mgrDef(c,i).art;
+}
+function bounceOp(i){
+  const el=rigEls[i]&&rigEls[i].opChibi;
+  if(!el)return;
+  el.classList.remove('happy');void el.offsetWidth;el.classList.add('happy');
+}
+
+/* ---------- navigation ---------- */
+function go(scr){
+  ui.screen=scr;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-'+scr));
+  document.querySelectorAll('.navBtn').forEach(b=>b.classList.toggle('sel',b.dataset.scr===scr));
+  buildScreen(scr);
+}
+function buildScreen(scr,force){
+  if(!ui.dirty[scr]&&!force)return;
+  ui.dirty[scr]=false;
+  ({miners:buildMiners,ops:buildOps,tasks:buildTasks,lab:buildLab,
+    prestige:buildPrestige,events:buildEvents,shop:buildShop,chains:buildChains})[scr]();
+}
+document.querySelectorAll('.navBtn').forEach(b=>b.addEventListener('click',()=>go(b.dataset.scr)));
+
+/* ---------- HUD ---------- */
+function updateHUD(dt){
+  const a=act(),ch=g.chains[a];
+  $('hudCoinSym').textContent=CHAINS[a].sym;
+  $('hudCoinIco').textContent=CHAINS[a].coinIco;
+  // count-up tween — numbers never jump-cut
+  const diff=ch.coins.sub(hudDisp.coin);
+  hudDisp.coin=diff.m<0?ch.coins:hudDisp.coin.add(diff.mul(Math.min(1,dt*7)));
+  if(ch.coins.sub(hudDisp.coin).e<ch.coins.e-3)hudDisp.coin=ch.coins;
+  $('hudCoinV').textContent=fmt(hudDisp.coin);
+  $('hudDHV').textContent=fmtInt(ch.dh);
+  $('hudGemV').textContent=fmtInt(g.gems);
+  $('hudShardV').textContent=fmtInt(g.shards);
+  hudDisp.energy+=(g.energy-hudDisp.energy)*Math.min(1,dt*8);
+  const cap=energyCap(),pct=Math.min(100,hudDisp.energy/cap*100);
+  $('energyBar').style.width=pct+'%';
+  $('energyTxt').textContent='⚡ '+Math.floor(hudDisp.energy)+' / '+cap;
+  $('energyRegen').textContent='+'+energyRegen().toFixed(1)+'/s';
+  // live boost chip — active multipliers are always visible
+  const now=Date.now(),bs=g.buffs.filter(b=>b.until>now);
+  if(bs.length){
+    const best=bs.reduce((a,b)=>b.mult>a.mult?b:a);
+    $('chipBuff').style.display='inline-flex';
+    $('hudBuffV').textContent='×'+best.mult+' · '+Math.ceil((best.until-now)/1000)+'s'+(bs.length>1?' +'+(bs.length-1):'');
+  }else $('chipBuff').style.display='none';
+}
+
+/* ---------- Golden Candle: rare tappable flying bonus ---------- */
+let candleNext=Date.now()+60e3+Math.random()*90e3;
+function maybeCandle(){
+  if(Date.now()<candleNext||document.hidden||document.querySelector('.goldCandle'))return;
+  candleNext=Date.now()+150e3+Math.random()*210e3;
+  const el=document.createElement('div');
+  el.className='goldCandle';el.innerHTML='<i>📈</i>';
+  el.style.top=(16+Math.random()*44)+'%';
+  el.addEventListener('pointerdown',e=>{
+    e.stopPropagation();el.remove();
+    const roll=Math.random();
+    if(roll<0.5){
+      g.buffs.push({c:0,r:null,mult:7,until:Date.now()+30000,name:'GOLDEN CANDLE'});
+      toast('📈 GOLDEN CANDLE! ×7 ALL profit for 30s!');
+    }else if(roll<0.8){
+      const bonus=Math.round(energyCap()*0.25);
+      g.energy+=bonus;
+      toast('📈 Golden Candle pops! +'+bonus+' ⚡');
+    }else{
+      g.gems+=3;
+      toast('📈 Golden Candle pops! +3 💠');
+    }
+    sfxPrestige();confettiBig();queueSave();
+  },{once:true});
+  setTimeout(()=>el.remove(),9300);
+  $('app').appendChild(el);
+}
+
+/* ============================================================
+   MINERS SCREEN
+   ============================================================ */
+function buildMiners(){
+  const c=act(),el=$('screen-miners'),ch=g.chains[c],rigs=ch.rigs,C=CHAINS[c];
+  rigEls=[];
+  let firstLocked=rigs.findIndex(r=>r.cnt===0);
+  if(firstLocked===-1)firstLocked=rigs.length;
+  const swap=g.chains[1]?`<button class="amtBtn" id="chainSwap" style="flex:0 0 auto;margin-left:auto;padding:4px 10px">🔁 switch</button>`:'';
+  let html=`<div class="screenTitle">${C.ico} ${C.name} <small id="chainRate"></small>${swap}</div>
+  <div id="buyAmtRow">
+    <span style="font-size:.68rem;color:var(--dim);font-weight:800">BUY</span>
+    ${['1','10','25','max'].map(a=>`<button class="amtBtn ${g.buyAmt===a?'sel':''}" data-amt="${a}">${a==='max'?'MAX':'x'+a}</button>`).join('')}
+  </div>`;
+  const showN=Math.min(rigs.length,firstLocked+1);
+  for(let i=0;i<showN;i++){
+    const def=C.rigs[i],r=rigs[i];
+    if(r.cnt===0){
+      html+=`<div class="card rigLocked" data-i="${i}">
+        <div class="rigArt">${rigSVG(def.ico)}</div>
+        <div style="flex:1;min-width:0"><div class="rigName">${def.name}</div>
+        <div class="sub" style="margin:2px 0 0">New mining frontier awaits…</div></div>
+        <button class="btn mint buyBtn unlockBtn" data-i="${i}">UNLOCK<span class="cost">⚡ ${fmtInt(rigUnitCost(c,i,0))}</span></button>
+      </div>`;
+    }else{
+      html+=`<div class="card rig" data-i="${i}">
+        <div class="rigArtWrap">
+          <div class="rigArt" data-el="art">${rigSVG(def.ico)}</div>
+          <div class="rigCnt" data-el="cnt"></div>
+          <div class="opSlot" data-el="op"></div>
+        </div>
+        <div class="rigMid">
+          <div class="rigName">${def.name}</div>
+          <div class="rigProfit"><span data-el="prof"></span> <span class="per" data-el="per"></span></div>
+          <div class="msBarWrap"><div class="msBar" data-el="ms"></div></div>
+          <div class="msLabel" data-el="msl"></div>
+          <div class="stages">
+            ${[['hash','Hash Pwr','Hash Power — coin per cycle'],['bw','Bandwidth','Bandwidth — cycle speed'],['wal','Cold Wallet','Cold Wallet — payout capacity cap']]
+              .map(([k,n,t])=>`<div class="stage" title="${t}"><span class="dot g" data-dot="${k}"></span><span class="stName">${n}</span><span class="stLv" data-lv="${k}"></span><button class="stUp" data-st="${k}" data-i="${i}"></button></div>`).join('')}
+          </div>
+        </div>
+        <div class="rigRight">
+          <button class="tapBtn" data-i="${i}"><span class="ring"></span>⛏️</button>
+          <button class="abilBtn" data-i="${i}" style="display:none">✨</button>
+          <button class="btn mint buyBtn" data-i="${i}"></button>
+        </div>
+      </div>`;
+    }
+  }
+  if(showN<rigs.length)html+=`<div class="card" style="text-align:center;color:var(--dim);font-size:.78rem">🔒 ${rigs.length-showN} more rigs await deeper in the chain…</div>`;
+  el.innerHTML=html;
+
+  el.querySelectorAll('.amtBtn[data-amt]').forEach(b=>b.addEventListener('click',()=>{
+    g.buyAmt=b.dataset.amt;queueSave();
+    el.querySelectorAll('.amtBtn[data-amt]').forEach(x=>x.classList.toggle('sel',x.dataset.amt===g.buyAmt));
+  }));
+  const sw=$('chainSwap');
+  if(sw)sw.addEventListener('click',()=>{
+    let n=g.active;
+    do{n=(n+1)%CHAINS.length;}while(!g.chains[n]);
+    switchChain(n);
+  });
+  el.querySelectorAll('.card[data-i]').forEach(card=>{
+    const i=+card.dataset.i,r=rigs[i];
+    if(r.cnt===0){
+      card.querySelector('.unlockBtn').addEventListener('click',e=>{
+        const saved=g.buyAmt;g.buyAmt='1';
+        const res=buyRig(c,i);g.buyAmt=saved;
+        if(res){sfxBuy();toast('🔓 '+C.rigs[i].name+' unlocked!');ui.dirty.miners=true;buildScreen('miners',true);ui.dirty.ops=true;}
+        else shakeBtn(e.currentTarget);
+      });
+      return;
+    }
+    const E={root:card,i,
+      art:card.querySelector('[data-el=art]'),cnt:card.querySelector('[data-el=cnt]'),
+      op:card.querySelector('[data-el=op]'),prof:card.querySelector('[data-el=prof]'),
+      per:card.querySelector('[data-el=per]'),ms:card.querySelector('[data-el=ms]'),
+      msl:card.querySelector('[data-el=msl]'),tap:card.querySelector('.tapBtn'),
+      abil:card.querySelector('.abilBtn'),buy:card.querySelector('.buyBtn'),
+      dots:{},lvs:{},ups:{}};
+    ['hash','bw','wal'].forEach(k=>{
+      E.dots[k]=card.querySelector(`[data-dot=${k}]`);
+      E.lvs[k]=card.querySelector(`[data-lv=${k}]`);
+      E.ups[k]=card.querySelector(`[data-st=${k}]`);
+      E.ups[k].addEventListener('click',e=>{
+        if(buySub(c,i,k))sfxBuy();else shakeBtn(e.currentTarget);
+      });
+    });
+    E.tap.addEventListener('pointerdown',e=>{e.preventDefault();tapRig(c,i,e.clientX,e.clientY);});
+    E.buy.addEventListener('click',e=>{
+      const before=msMult(r.cnt);
+      const res=buyRig(c,i);
+      if(res){
+        sfxBuy();
+        const after=msMult(r.cnt);
+        if(after>before){
+          sfxMilestone();confettiBig();
+          toast('🎉 MILESTONE! '+C.rigs[i].name+' ×'+(after/before)+' profit!');
+        }
+        if(res.k&&rigs[i].cnt===res.k){}
+      } else shakeBtn(e.currentTarget);
+    });
+    E.abil.addEventListener('click',()=>{
+      if(useAbility(c,i)){
+        sfxAbility();
+        const c2=E.op.querySelector('.chibi');
+        if(c2){c2.classList.remove('cast');void c2.offsetWidth;c2.classList.add('cast');}
+        toast('✨ '+mgrDef(c,i).abil.name+'! '+mgrDef(c,i).abil.txt);
+      }
+    });
+    renderOpSlot(E,c,i);
+    rigEls[i]=E;
+  });
+  updateMiners(true);
+}
+function renderOpSlot(E,c,i){
+  const r=g.chains[c].rigs[i];
+  if(r.mgr){
+    E.op.innerHTML=chibiSVG(mgrArt(c,i));
+    E.opChibi=E.op.querySelector('.chibi');
+    E.op.title=mgrDef(c,i).name;
+  }else{
+    E.op.innerHTML=`<div class="noOp">no operator<br>💤 no idle</div>`;
+    E.opChibi=null;
+  }
+}
+function shakeBtn(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');sfxTapDud();}
+
+function updateMiners(force){
+  if(ui.screen!=='miners'&&!force)return;
+  const c=act();
+  const rate=totalRate(c);
+  const cr=$('chainRate');if(cr)cr.textContent='+'+fmt(rate)+' '+CHAINS[c].sym+'/s';
+  rigEls.forEach(E=>{
+    if(!E)return;
+    const i=E.i,r=g.chains[c].rigs[i];
+    E.cnt.textContent='× '+r.cnt;
+    E.art.classList.toggle('tier1',r.cnt>=25&&r.cnt<100);
+    E.art.classList.toggle('tier2',r.cnt>=100);
+    if(r.mgr){E.prof.textContent=fmt(rigRate(c,i));E.per.textContent=CHAINS[c].sym+'/sec';}
+    else{E.prof.textContent=fmt(rigCycleProfit(c,i));E.per.textContent=CHAINS[c].sym+'/cycle · '+cycleTime(c,i).toFixed(1)+'s';}
+    const p=prevMs(r.cnt),n=nextMs(r.cnt);
+    E.ms.style.width=Math.min(100,(r.cnt-p)/(n-p)*100)+'%';
+    E.msl.textContent=r.cnt+' / '+n+' → ×'+(msMult(n)/msMult(r.cnt))+' profit';
+    const bn=bottleneck(c,i);
+    ['hash','bw','wal'].forEach(k=>{
+      E.dots[k].className='dot '+bn.st[k];
+      E.lvs[k].textContent='Lv '+r[k];
+      const cost=subCost(c,i,k);
+      E.ups[k].textContent='▲ '+fmt(cost);
+      E.ups[k].classList.toggle('can',g.chains[c].coins.gte(cost));
+      E.ups[k].classList.toggle('off',!g.chains[c].coins.gte(cost));
+    });
+    const k=g.buyAmt==='max'?maxAffordable(c,i):parseInt(g.buyAmt,10);
+    const kk=Math.max(1,k),cost=rigBulkCost(c,i,kk);
+    E.buy.innerHTML='BUY ×'+kk+'<span class="cost">⚡ '+fmtInt(Math.ceil(cost))+'</span>';
+    const can=g.energy>=cost&&(g.buyAmt!=='max'||k>0);
+    E.buy.classList.toggle('mint',can);E.buy.classList.toggle('off',!can);
+    // ability chip
+    if(r.mgr){
+      E.abil.style.display='flex';
+      if(abilReady(c,i)){E.abil.className='abilBtn';E.abil.textContent='✨';E.abil.title=mgrDef(c,i).abil.name;}
+      else{E.abil.className='abilBtn cd';E.abil.textContent=Math.ceil(abilCdLeft(c,i))+'';}
+    }
+  });
+}
+function updateRings(){
+  if(ui.screen!=='miners')return;
+  const c=act();
+  rigEls.forEach(E=>{
+    if(!E)return;
+    const r=g.chains[c].rigs[E.i],cyc=cycleTime(c,E.i);
+    const pct=Math.min(1,r.prog/cyc)*100;
+    E.tap.style.setProperty('--p',r.mgr?pct:pct);
+    E.tap.classList.toggle('ready',!r.mgr&&r.prog>=cyc);
+    E.tap.classList.toggle('auto',r.mgr);
+  });
+}
+
+/* ============================================================
+   OPERATORS SCREEN
+   ============================================================ */
+function buildOps(){
+  const c=act(),el=$('screen-ops');opEls=[];
+  const roster=c===1?MGRS_L2:MGRS;
+  let html=`<div class="screenTitle">👧 ${CHAINS[c].ico} Operators <small>hire to automate · tap abilities for bursts</small></div>`;
+  roster.forEach((m,i)=>{
+    const r=g.chains[c].rigs[i];
+    const skins=c===0?SKINS.filter(s=>s.mgr===i):[];
+    html+=`<div class="card opCard" data-i="${i}">
+      <div style="text-align:center">
+        <div class="opFrame rar-${m.rar}">${chibiSVG(mgrArt(c,i))}</div>
+        <div class="rarName rar-${m.rar}">${RAR_LABEL[m.rar]}</div>
+      </div>
+      <div class="opInfo">
+        <div class="opName">${m.name}</div>
+        <div class="opDesc">${m.desc}</div>
+        <div class="opDesc" style="color:var(--blue)">⛏️ Runs: ${CHAINS[c].rigs[i].name}</div>
+        <div class="opAbil">✨ ${m.abil.name} — ${m.abil.txt} <span data-el="cd" style="color:var(--dim)"></span></div>
+        ${skins.length?`<div class="skinRow" data-el="skins"></div>`:''}
+      </div>
+      <div class="opBtns">
+        <button class="btn" data-el="hire"></button>
+        <button class="btn" data-el="abil">✨ Use</button>
+        <button class="btn" data-el="acct" title="Whale Accountant: −10% rig cost + per-second display. Wiped on prestige!"></button>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+  el.querySelectorAll('.opCard').forEach(card=>{
+    const i=+card.dataset.i;
+    const E={i,c,card,hire:card.querySelector('[data-el=hire]'),abil:card.querySelector('[data-el=abil]'),
+      acct:card.querySelector('[data-el=acct]'),cd:card.querySelector('[data-el=cd]'),
+      skins:card.querySelector('[data-el=skins]'),frame:card.querySelector('.opFrame')};
+    E.hire.addEventListener('click',e=>{
+      if(hireMgr(c,i)){
+        sfxMilestone();confettiBig();
+        toast('🎊 '+roster[i].name+' joined your crew!');
+        ui.dirty.miners=true;buildScreen('ops',true);
+      }else shakeBtn(e.currentTarget);
+    });
+    E.abil.addEventListener('click',e=>{
+      if(useAbility(c,i)){
+        sfxAbility();
+        const c2=E.frame.querySelector('.chibi');
+        if(c2){c2.classList.remove('cast');void c2.offsetWidth;c2.classList.add('cast');}
+        toast('✨ '+roster[i].abil.name+'!');
+      }else shakeBtn(e.currentTarget);
+    });
+    E.acct.addEventListener('click',e=>{
+      if(buyAcct(c,i)){sfxPrestige();toast('🐋 '+roster[i].name+' is now a Whale Accountant! −10% rig costs.');buildScreen('ops',true);}
+      else shakeBtn(e.currentTarget);
+    });
+    if(E.skins){
+      renderSkinRow(E,i);
+    }
+    opEls[i]=E;
+  });
+  updateOps(true);
+}
+function renderSkinRow(E,i){
+  const skins=SKINS.filter(s=>s.mgr===i);
+  E.skins.innerHTML='<button class="skinDot" data-sk="">🧍</button>'+skins.map(s=>{
+    const own=!!g.skins[s.id];
+    return `<button class="skinDot ${g.equip[i]===s.id?'sel':''}" data-sk="${s.id}" title="${esc(s.name)} — +${Math.round(s.bonus*100)}%${own?'':' · '+(s.srcTxt||'Mystery Wallet chest')}" ${own?'':'style="opacity:.35;filter:grayscale(1)"'}>${own?'👘':'❓'}</button>`;
+  }).join('');
+  if(!g.equip[i])E.skins.querySelector('[data-sk=""]').classList.add('sel');
+  E.skins.querySelectorAll('.skinDot').forEach(b=>b.addEventListener('click',()=>{
+    const id=b.dataset.sk;
+    if(id&&!g.skins[id]){toast('🔒 Not owned yet — '+(SKINS.find(s=>s.id===id).srcTxt||'find it in Mystery Wallets!'));return;}
+    if(id)g.equip[i]=id;else delete g.equip[i];
+    queueSave();sfxBuy();
+    ui.dirty.miners=true;buildScreen('ops',true);
+  }));
+}
+function updateOps(force){
+  if(ui.screen!=='ops'&&!force)return;
+  opEls.forEach(E=>{
+    if(!E)return;
+    const i=E.i,c=E.c,m=mgrDef(c,i),ch=g.chains[c],r=ch.rigs[i];
+    if(r.mgr){
+      E.hire.textContent='✓ On the job';
+      E.hire.className='btn ghost';E.hire.disabled=true;
+      E.abil.style.display='';E.acct.style.display='';
+      if(abilReady(c,i)){E.abil.className='btn gold';E.abil.textContent='✨ Use';E.cd.textContent='';}
+      else{E.abil.className='btn off';E.abil.textContent='⏳ '+fmtTime(abilCdLeft(c,i));E.cd.textContent='';}
+      if(r.acct){E.acct.textContent='🐋 Whale Acct ✓';E.acct.className='btn ghost';E.acct.disabled=true;}
+      else{
+        E.acct.innerHTML='🐋 Accountant<span class="cost">💎🙌 '+acctCost(i)+'</span>';
+        E.acct.className='btn '+(ch.dh>=acctCost(i)?'blue':'off');
+      }
+    }else{
+      E.abil.style.display='none';E.acct.style.display='none';
+      if(r.cnt===0){E.hire.textContent='Own the rig first';E.hire.className='btn off';}
+      else if(m.free){E.hire.textContent='FREE';E.hire.className='btn mint';}
+      else{
+        E.hire.innerHTML='HIRE<span class="cost">'+fmt(m.cost)+' '+CHAINS[c].sym+'</span>';
+        E.hire.className='btn '+(ch.coins.gte(D.from(m.cost))?'mint':'off');
+      }
+    }
+  });
+}
+
+/* ============================================================
+   TASKS SCREEN
+   ============================================================ */
+function buildTasks(){
+  const el=$('screen-tasks');
+  const dailies=todaysDailies();
+  const msLeft=new Date();msLeft.setHours(24,0,0,0);
+  let html=`<div class="screenTitle">✅ Tasks <small>always something to do</small></div>
+  <div class="card"><div class="cardTitle">🌸 Daily Tasks <span class="tag live" style="margin-left:auto">resets ${fmtTime((msLeft-Date.now())/1000)}</span></div>
+    ${dailies.map(t=>`<div class="taskRow" data-d="${t.id}">
+      <div class="taskInfo"><div class="taskName">${t.name}</div>
+      <div class="taskProg"><i data-el="bar"></i></div><div class="taskPct" data-el="pct"></div></div>
+      <div class="taskRew">${rewTxt(t.rew)}</div>
+      <button class="btn mint claimBtn" data-el="claim">Claim</button>
+    </div>`).join('')}
+  </div>
+  <div class="card" id="sprintCard"></div>
+  <div class="card"><div class="cardTitle">🏆 Chain Milestones</div>
+    ${MILESTONE_TASKS.map(t=>`<div class="taskRow" data-m="${t.id}">
+      <div class="taskInfo"><div class="taskName">${t.name}</div><div class="taskPct">${t.desc}</div></div>
+      <div class="taskRew">${rewTxt(t.rew)}</div>
+      <button class="btn mint claimBtn" data-el="claim">Claim</button>
+    </div>`).join('')}
+  </div>
+  <div class="card"><div class="cardTitle">🏅 Achievement Wall <small id="achCount" style="margin-left:auto;color:var(--dim)"></small></div>
+    <div class="achGrid">${ACHS.map(a=>`<div class="ach ${g.achDone[a.id]?'done':''}" title="${esc(a.name)} — +${a.shards}🔬">${a.ico}</div>`).join('')}</div>
+  </div>`;
+  el.innerHTML=html;
+  el.querySelectorAll('[data-d]').forEach(row=>{
+    row.querySelector('[data-el=claim]').addEventListener('click',()=>{if(claimDaily(row.dataset.d))buildScreen('tasks',true);});
+  });
+  el.querySelectorAll('[data-m]').forEach(row=>{
+    row.querySelector('[data-el=claim]').addEventListener('click',()=>{if(claimMilestone(row.dataset.m))buildScreen('tasks',true);});
+  });
+  buildSprintCard();
+  updateTasks(true);
+}
+function rewTxt(r){
+  const b=[];
+  if(r.energy)b.push(r.energy+'⚡');if(r.gems)b.push(r.gems+'💠');
+  if(r.shards)b.push(r.shards+'🔬');if(r.skin)b.push('👘');
+  return b.join(' ');
+}
+function buildSprintCard(){
+  const c=$('sprintCard');if(!c)return;
+  const s=g.sprint,now=Date.now();
+  let inner=`<div class="cardTitle">⏱️ Energy Sprint <span class="tag ${s.endsAt>now?'live':'soon'}" style="margin-left:auto">${s.endsAt>now?'RUNNING':'puzzle'}</span></div>
+  <div class="sub" style="margin-top:4px">Optimization challenge: from the moment you start, out-earn your idle baseline for 10 minutes. Buy rigs, pop abilities, tap like crazy — beat par for ★★★.</div>`;
+  if(s.endsAt>now){
+    inner+=`<div class="taskProg" style="margin:6px 0"><i id="sprintBar"></i></div>
+    <div class="taskPct" id="sprintStat"></div>`;
+  }else if(now<s.cdUntil){
+    inner+=`<button class="btn off" style="width:100%" disabled>Next sprint in <span id="sprintCd">${fmtTime((s.cdUntil-now)/1000)}</span></button>`;
+  }else{
+    inner+=`<button class="btn pink" style="width:100%" id="sprintStart">▶ Start 10-minute Sprint</button>`;
+  }
+  inner+=`<div class="taskPct" style="margin-top:5px">Best: ${'★'.repeat(s.best)||'—'} · Runs: ${s.runs} · Rewards: ★5💠 ★★10💠 ★★★20💠</div>`;
+  c.innerHTML=inner;
+  const b=$('sprintStart');
+  if(b)b.addEventListener('click',()=>{if(startSprint())buildScreen('tasks',true);});
+}
+function updateTasks(force){
+  if(ui.screen!=='tasks'&&!force)return;
+  const el=$('screen-tasks');
+  todaysDailies().forEach(t=>{
+    const row=el.querySelector(`[data-d=${t.id}]`);if(!row)return;
+    const v=Math.min(t.t,t.val(g)),done=g.dailyClaimed[t.id];
+    row.querySelector('[data-el=bar]').style.width=(v/t.t*100)+'%';
+    row.querySelector('[data-el=pct]').textContent=done?'✓ claimed':fmtInt(v)+' / '+fmtInt(t.t);
+    const btn=row.querySelector('[data-el=claim]');
+    btn.style.visibility=(v>=t.t&&!done)?'visible':'hidden';
+  });
+  MILESTONE_TASKS.forEach(t=>{
+    const row=el.querySelector(`[data-m=${t.id}]`);if(!row)return;
+    const done=g.msClaimed[t.id];
+    let ok=false;try{ok=t.chk(g);}catch(e){}
+    const btn=row.querySelector('[data-el=claim]');
+    btn.style.visibility=(ok&&!done)?'visible':'hidden';
+    row.style.opacity=done?0.45:1;
+    if(done)row.querySelector('.taskName').textContent='✓ '+t.name.replace(/^✓ /,'');
+  });
+  const ac=$('achCount');
+  if(ac)ac.textContent=Object.keys(g.achDone).length+' / '+ACHS.length;
+  const s=g.sprint,now=Date.now();
+  if(s.endsAt>now){
+    const bar=$('sprintBar'),stat=$('sprintStat');
+    if(bar){
+      bar.style.width=((600-(s.endsAt-now)/1000)/600*100)+'%';
+      const earned=g.chains[0].lifetime.sub(s.startLife);
+      const par=Math.max(1,s.base*600);
+      stat.textContent=fmtTime((s.endsAt-now)/1000)+' left · earned '+fmt(earned)+' / par '+fmt(par)+' ('+(earned.div(par).num()*100).toFixed(0)+'%)';
+    }
+  }else if($('sprintBar')||($('sprintCd')&&now>=s.cdUntil)){buildSprintCard();}
+  else if($('sprintCd'))$('sprintCd').textContent=fmtTime((s.cdUntil-now)/1000);
+}
+
+/* ============================================================
+   LAB (RESEARCH) SCREEN
+   ============================================================ */
+function buildLab(){
+  const el=$('screen-lab');
+  let html=`<div class="screenTitle">🔬 Blockchain Lab <small>spend Research Shards from achievements</small></div>
+  <div class="card" style="text-align:center;font-weight:900">You have <span style="color:var(--mint2)">${g.shards} 🔬</span> Research Shards</div>
+  <div class="labGrid">`;
+  for(const br of LAB_BRANCHES){
+    html+=`<div class="labBranch"><h4>${br.ico} ${br.name}</h4>`;
+    for(const r of RESEARCH.filter(x=>x.br===br.id)){
+      const owned=g.research[r.id],locked=r.req&&!g.research[r.req];
+      html+=`<div class="labNode ${owned?'owned':''} ${locked?'lockedN':''}">
+        <div style="flex:1;min-width:0"><b>${r.name}</b>${r.desc}</div>
+        ${owned?'<span style="color:var(--mint)">✓</span>':
+          `<button class="btn ${canResearch(r)?'mint':'off'}" data-r="${r.id}">${r.cost}🔬</button>`}
+      </div>`;
+    }
+    html+=`</div>`;
+  }
+  html+=`</div>`;
+  el.innerHTML=html;
+  el.querySelectorAll('[data-r]').forEach(b=>b.addEventListener('click',e=>{
+    if(buyResearch(b.dataset.r)){sfxMilestone();toast('🔬 Research complete!');buildScreen('lab',true);}
+    else shakeBtn(e.currentTarget);
+  }));
+}
+
+/* ============================================================
+   PRESTIGE SCREEN
+   ============================================================ */
+function buildPrestige(){
+  const c=act(),el=$('screen-prestige'),ch=g.chains[c],C=CHAINS[c];
+  let html=`<div class="screenTitle">💎🙌 Diamond Hands <small>${C.ico} ${C.name}</small></div>
+  <div class="card">
+    <div class="dhBig"><div class="v"><span id="dhCur">${fmtInt(ch.dh)}</span> ◈</div>
+    <div class="sub" style="text-align:center">each ◈ = +2% profit forever → <b style="color:var(--mint2)">+${fmtInt(ch.dh*2)}%</b> right now · prestiged ${ch.prestiges}×</div></div>
+    <div class="dhGainBar"><i id="dhBar"></i></div>
+    <div class="sub" style="text-align:center" id="dhNext"></div>
+    <div style="text-align:center;margin:8px 0 4px;font-weight:900;font-size:1.05rem">Claimable now: <span style="color:#c8f4ff" id="dhGain">0</span> ◈</div>
+    <button class="btn pink" style="width:100%;font-size:1rem" id="prestigeBtn">🚀 HODL RESET — claim Diamond Hands</button>
+    <div class="sub" style="margin-top:8px">Resets: ${C.sym} balance, rigs, sub-stages, Operators & Whale Accountants on this chain.<br>Keeps: ◈, Research, Skins, Achievements, other Chains. Your starter Operator always comes back free 💕</div>
+  </div>
+  <div class="card"><div class="cardTitle">🛒 Diamond Hands Shop <small style="color:var(--dim)">spending ◈ lowers your % bonus — choose wisely</small></div>
+    ${DH_SHOP.map(it=>{
+      const lvl=dhShopLvlC(c,it.id),cost=Math.ceil(it.cost*Math.pow(it.scale||1,lvl)),maxed=lvl>=(it.max||99);
+      return `<div class="shopItem"><div class="shopIco">${it.ico}</div>
+      <div class="shopInfo"><div class="shopName">${it.name} ${lvl?`<span class="tag new">Lv ${lvl}</span>`:''}</div>
+      <div class="shopDesc">${it.desc}</div></div>
+      <button class="btn ${maxed?'off':(ch.dh>=cost?'blue':'off')}" data-dh="${it.id}">${maxed?'MAX':cost+' ◈'}</button></div>`;
+    }).join('')}
+  </div>`;
+  el.innerHTML=html;
+  $('prestigeBtn').addEventListener('click',()=>{
+    const gain=dhGainAvailable(c);
+    if(gain<=0){shakeBtn($('prestigeBtn'));toast('Not enough lifetime earnings yet — check the progress bar!');return;}
+    confirmPrestige(c,gain);
+  });
+  el.querySelectorAll('[data-dh]').forEach(b=>b.addEventListener('click',e=>{
+    if(buyDhShop(c,b.dataset.dh)){sfxBuy();toast('🛒 Purchased!');buildScreen('prestige',true);}
+    else shakeBtn(e.currentTarget);
+  }));
+  updatePrestige(true);
+}
+function updatePrestige(force){
+  if(ui.screen!=='prestige'&&!force)return;
+  const c=act(),ch=g.chains[c],gain=dhGainAvailable(c);
+  const gEl=$('dhGain');if(!gEl)return;
+  gEl.textContent=fmtInt(gain);
+  $('dhCur').textContent=fmtInt(ch.dh);
+  const nxt=nextDhAt(c);
+  const mag=1+0.1*dhShopLvlC(c,'magnet');
+  const prevSq=Math.max(0,ch.dhClaimed+gain), prevLife=D.from(prevSq/mag).mul(prevSq/mag).mul(CHAINS[c].K);
+  const span=nxt.sub(prevLife), into=ch.lifetime.sub(prevLife);
+  const pct=span.isZero()?0:Math.max(0,Math.min(100,into.div(span).num()*100));
+  $('dhBar').style.width=pct+'%';
+  $('dhNext').textContent='next ◈ at '+fmt(nxt)+' lifetime '+CHAINS[c].sym+' (now: '+fmt(ch.lifetime)+')';
+  $('prestigeBtn').classList.toggle('off',gain<=0);
+}
+function confirmPrestige(c,gain){
+  const ch=g.chains[c];
+  const gentle=gain<0.05*ch.dh;
+  showModal(`<div class="modalTitle">🚀 HODL Reset?</div>
+  <div style="text-align:center">${chibiSVG(MGRS[0].art)}</div>
+  <div class="modalBody" style="text-align:center">
+    You'll claim <b style="color:#c8f4ff;font-size:1.3rem">${fmtInt(gain)} ◈</b> Diamond Hands<br>
+    (= +${fmtInt(gain*2)}% profit, forever)<br><br>
+    ${gentle?`<span style="color:var(--gold2)">Ooh — that's a teeny gain compared to your ${fmtInt(ch.dh)} ◈.<br>Miko-chan suggests pushing a little further first! 🌸</span><br><br>`:''}
+    Your rigs, coins and Operators on Genesis reset.<br>Everything ◈-related stays. Ganbatte! 💪
+  </div>
+  <div class="modalBtns">
+    <button class="btn ghost" id="mCancel">Keep grinding</button>
+    <button class="btn pink" id="mGo">Reset & claim ◈${fmtInt(gain)}</button>
+  </div>`);
+  $('mCancel').addEventListener('click',closeModal);
+  $('mGo').addEventListener('click',()=>{
+    closeModal();
+    const got=doPrestige(c);
+    sfxPrestige();confettiBig();
+    toast('💎🙌 +'+fmtInt(got)+' Diamond Hands! Fresh chain, bigger dreams.');
+    hudDisp.coin=D0();
+    Object.keys(ui.dirty).forEach(k=>ui.dirty[k]=true);
+    go('miners');
+  });
+}
+
+/* ============================================================
+   EVENTS SCREEN
+   ============================================================ */
+function buildEvents(){
+  const el=$('screen-events');
+  const ev=eventInfo(Date.now());
+  if(!ev.active){
+    el.innerHTML=`<div class="screenTitle">🔥 Pump Events</div>
+    <div class="evBanner"><div class="cardTitle">Next event: ${ev.theme?eventInfo(ev.nextAt+1).theme.name:''}</div>
+    <div class="sub" style="margin-top:4px">A meme-coin goes vertical for 60 hours. Separate mini-economy, frantic tap minigame, exclusive Operator skin.</div>
+    <div class="evTimer" id="evCountdown">starts in …</div></div>
+    <div class="card"><div class="cardTitle">🎁 Event reward track preview</div>
+    ${EV_TRACK.map(t=>`<div class="taskRow"><div class="taskInfo"><div class="taskName">${fmtInt(t.at)} event coins</div></div><div class="taskRew">${t.txt}</div></div>`).join('')}
+    <div class="sub" style="margin-top:6px">🐰 Top prize: the <b>Bull-Run Bunny Suit</b> — permanent Legendary skin for Whale-tan (+3%).</div></div>`;
+    return;
+  }
+  const th=ev.theme;
+  let html=`<div class="screenTitle">🔥 Pump Events</div>
+  <div class="evBanner"><div class="cardTitle">${th.ico} ${th.name} <span class="tag live" style="margin-left:auto">LIVE</span></div>
+  <div class="evTimer">ends in <span id="evEnds"></span></div>
+  <div style="font-weight:900;font-size:1.1rem;margin-top:4px">${th.ico} <span id="evBal"></span> ${th.sym}</div></div>
+  <div class="card"><div class="cardTitle">🚀 Meme Reactor <small style="margin-left:auto;color:var(--dim)">Lv <span id="evRigLv"></span> · +<span id="evRate"></span> ${th.sym}/s</small></div>
+    <div class="sub">The event's single, gloriously overpowered rig. Level it to multiply pump payouts.</div>
+    <button class="btn gold" style="width:100%" id="evRigBuy"></button>
+  </div>
+  <div class="card" style="text-align:center"><div class="cardTitle" style="justify-content:center">📈 Pump the Chart</div>
+    <div class="sub">10 seconds. Tap like your bags depend on it. 50+ taps = HYPE MAX → giant global multiplier!</div>
+    <button id="pumpBtn"><span id="pumpTop">PUMP!</span><span style="font-size:.7rem" id="pumpSub"></span></button>
+    <div class="hypeWrap"><i id="hypeBar"></i></div>
+    <div class="taskPct" id="pumpStat" style="margin-top:4px"></div>
+  </div>
+  <div class="card"><div class="cardTitle">🎁 Reward Track</div>
+    ${EV_TRACK.map((t,idx)=>`<div class="taskRow">
+      <div class="taskInfo"><div class="taskName">${fmtInt(t.at)} ${th.sym}</div>
+      <div class="taskProg"><i data-ev="${idx}"></i></div></div>
+      <div class="taskRew">${t.txt}</div>
+      <button class="btn mint claimBtn" data-evc="${idx}">Claim</button>
+    </div>`).join('')}
+  </div>`;
+  el.innerHTML=html;
+  $('evRigBuy').addEventListener('click',e=>{if(buyEvRig())buildScreen('events',true);else shakeBtn(e.currentTarget);});
+  $('pumpBtn').addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    if(g.event.pump){pumpTap();burst(e.clientX,e.clientY,4,['#ff6fb5','#ffd75e']);}
+    else if(startPump())buildScreen('events',true);
+    else shakeBtn($('pumpBtn'));
+  });
+  el.querySelectorAll('[data-evc]').forEach(b=>b.addEventListener('click',()=>{
+    if(claimEvTrack(+b.dataset.evc))buildScreen('events',true);
+  }));
+  updateEvents(true);
+}
+function updateEvents(force){
+  if(ui.screen!=='events'&&!force)return;
+  const ev=eventInfo(Date.now());
+  if(!ev.active){
+    const cd=$('evCountdown');
+    if(cd)cd.textContent='starts in '+fmtTime((ev.nextAt-Date.now())/1000);
+    else buildScreen('events',true);
+    return;
+  }
+  if(!$('evBal')){buildScreen('events',true);return;}
+  const th=ev.theme;
+  $('evEnds').textContent=fmtTime((ev.endsAt-Date.now())/1000);
+  $('evBal').textContent=fmtInt(g.event.cur);
+  $('evRigLv').textContent=g.event.rig;
+  $('evRate').textContent=(g.event.rig*0.6).toFixed(1);
+  $('evRigBuy').innerHTML='LEVEL UP REACTOR<span class="cost">'+fmtInt(evRigCost())+' '+th.sym+'</span>';
+  $('evRigBuy').className='btn '+(g.event.cur>=evRigCost()?'gold':'off');
+  const p=g.event.pump;
+  if(p){
+    const left=Math.max(0,(p.endsAt-Date.now())/1000);
+    $('pumpTop').textContent=p.taps+' taps';
+    $('pumpSub').textContent=left.toFixed(1)+'s left — TAP TAP TAP!';
+    $('hypeBar').style.width=Math.min(100,p.taps/50*100)+'%';
+    $('pumpStat').textContent=p.taps>=50?'🚀 HYPE MAX secured!':'reach 50 taps for HYPE MAX';
+  }else{
+    const cdLeft=Math.max(0,(g.event.pumpCd-Date.now())/1000);
+    $('pumpTop').textContent='PUMP!';
+    $('pumpSub').textContent=cdLeft>0?'ready in '+fmtTime(cdLeft):'tap to start · 10s frenzy';
+    $('hypeBar').style.width='0%';
+    $('pumpStat').textContent='payout scales with Reactor level';
+  }
+  EV_TRACK.forEach((t,idx)=>{
+    const bar=document.querySelector(`[data-ev="${idx}"]`);
+    if(bar)bar.style.width=Math.min(100,g.event.cur/t.at*100)+'%';
+    const btn=document.querySelector(`[data-evc="${idx}"]`);
+    if(btn)btn.style.visibility=(g.event.cur>=t.at&&!g.event.claimed[idx])?'visible':'hidden';
+  });
+}
+
+/* ============================================================
+   SHOP SCREEN
+   ============================================================ */
+function buildShop(){
+  const el=$('screen-shop');
+  el.innerHTML=`<div class="screenTitle">🛍️ Shop <small>💠 gems are earned by playing — no wallet needed</small></div>
+  <div class="card"><div class="cardTitle">💠 ${fmtInt(g.gems)} gems</div>
+  <div class="sub">Earn gems from Daily Tasks, Milestones, Achievements, Sprints and Pump Events.</div></div>
+  <div class="card">
+    <div class="shopItem"><div class="shopIco">👛</div>
+      <div class="shopInfo"><div class="shopName">Mystery Wallet</div>
+      <div class="shopDesc">One random Operator skin (dupes → +10💠). Skins give permanent rig bonuses!</div></div>
+      <button class="btn ${g.gems>=CHEST_COST?'pink':'off'}" id="chestBtn">${CHEST_COST} 💠</button></div>
+    <div class="shopItem"><div class="shopIco">⏳</div>
+      <div class="shopInfo"><div class="shopName">Time Capsule</div>
+      <div class="shopDesc">Instantly grants 2 hours of managed production.</div></div>
+      <button class="btn ${g.gems>=25?'pink':'off'}" id="capsBtn">25 💠</button></div>
+    <div class="shopItem"><div class="shopIco">⚡</div>
+      <div class="shopInfo"><div class="shopName">Energy Refill</div>
+      <div class="shopDesc">Refill Energy to max immediately.</div></div>
+      <button class="btn ${g.gems>=10?'pink':'off'}" id="fillBtn">10 💠</button></div>
+  </div>
+  <div class="card"><div class="cardTitle">👘 Skin Collection <small style="margin-left:auto;color:var(--dim)">${Object.keys(g.skins).length}/${SKINS.length}</small></div>
+    ${SKINS.map(s=>{
+      const own=!!g.skins[s.id];
+      return `<div class="shopItem" ${own?'':'style="opacity:.55"'}>
+      <div class="opFrame rar-${s.rar}" style="width:46px;height:50px">${own?chibiSVG({...MGRS[s.mgr].art,...s.art}):'<span style="font-size:1.3rem;margin:auto">❓</span>'}</div>
+      <div class="shopInfo"><div class="shopName">${s.name}</div>
+      <div class="shopDesc"><span class="rarName rar-${s.rar}">${RAR_LABEL[s.rar]}</span> · +${Math.round(s.bonus*100)}% ${MGRS[s.mgr].name} · ${own?'owned ✓':(s.srcTxt||'Mystery Wallet')}</div></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+  $('chestBtn').addEventListener('click',e=>{
+    const pick=openChest();
+    if(pick){showSkinModal(pick);buildScreen('shop',true);}
+    else shakeBtn(e.currentTarget);
+  });
+  $('capsBtn').addEventListener('click',e=>{if(buyTimeCapsule())buildScreen('shop',true);else shakeBtn(e.currentTarget);});
+  $('fillBtn').addEventListener('click',e=>{if(buyEnergyRefill())buildScreen('shop',true);else shakeBtn(e.currentTarget);});
+}
+function showSkinModal(sk){
+  const owned=g.skins[sk.id];
+  showModal(`<div class="modalTitle">👛 Mystery Wallet</div>
+  <div style="text-align:center"><div class="opFrame rar-${sk.rar}" style="width:90px;height:100px;margin:8px auto">${chibiSVG({...MGRS[sk.mgr].art,...sk.art})}</div>
+  <div class="rarName rar-${sk.rar}" style="font-size:.8rem">${RAR_LABEL[sk.rar]}</div>
+  <div style="font-weight:900;margin:4px 0">${sk.name}</div>
+  <div class="sub">+${Math.round(sk.bonus*100)}% to ${MGRS[sk.mgr].name}'s rig ${owned?'':'(duplicate → +10💠)'}</div></div>
+  <div class="modalBtns"><button class="btn pink" id="mOk">Kawaii!! ✨</button></div>`);
+  $('mOk').addEventListener('click',closeModal);
+}
+
+/* ============================================================
+   CHAINS SCREEN
+   ============================================================ */
+function buildChains(){
+  const el=$('screen-chains');
+  let html=`<div class="screenTitle">🌐 Chains <small>parallel economies, one Energy pool</small></div>`;
+  CHAINS.forEach((c,idx)=>{
+    const st=g.chains[idx];
+    if(st){
+      const isAct=idx===act();
+      html+=`<div class="card chainCard"><div class="chainIco">${c.ico}</div>
+      <div style="flex:1;min-width:0"><div class="cardTitle">${c.name} ${isAct?'<span class="tag live">ACTIVE</span>':'<span class="tag new">UNLOCKED</span>'}</div>
+      <div class="sub" style="margin:3px 0 0">${c.desc}</div>
+      <div class="taskPct">💰 ${fmt(st.coins)} ${c.sym} · +${fmt(totalRate(idx))}/s · lifetime ${fmt(st.lifetime)} · ◈${fmtInt(st.dh)} · prestiged ${st.prestiges}×</div></div>
+      ${isAct?'':`<button class="btn blue" data-sw="${idx}">GO ➜</button>`}</div>`;
+    }else{
+      let prog='';
+      if(c.unlockLife){
+        const pct=Math.min(100,g.chains[0].lifetime.div(c.unlockLife).num()*100);
+        prog=`<div class="taskProg" style="margin-top:5px"><i style="width:${pct}%"></i></div><div class="taskPct">${pct.toFixed(pct<1?2:0)}% — ${c.unlockDesc}</div>`;
+      }else if(c.unlockPrestige){
+        prog=`<div class="taskPct" style="margin-top:4px">${c.unlockDesc} (${g.chains[0].prestiges}/${c.unlockPrestige})</div>`;
+      }
+      html+=`<div class="card chainCard lockedC"><div class="chainIco">${c.ico}</div>
+      <div style="flex:1;min-width:0"><div class="cardTitle">${c.name} <span class="tag soon">COMING SOON</span></div>
+      <div class="sub" style="margin:3px 0 0">${c.coin} (${c.sym}) — ${c.desc}</div>${prog}</div></div>`;
+    }
+  });
+  html+=`<div class="sub" style="text-align:center;margin-top:4px">New Chains launch as full parallel economies — 10 rigs, 10 Operators, their own ◈ pool — all fed by your one shared ⚡ Energy supply.</div>`;
+  el.innerHTML=html;
+  el.querySelectorAll('[data-sw]').forEach(b=>b.addEventListener('click',()=>switchChain(+b.dataset.sw)));
+}
+function switchChain(idx){
+  if(!g.chains[idx]||idx===g.active)return;
+  g.active=idx;
+  hudDisp.coin=D.from(g.chains[idx].coins); // snap the tween across currencies
+  ui.dirty.miners=true;ui.dirty.ops=true;ui.dirty.prestige=true;ui.dirty.chains=true;
+  queueSave();sfxAbility();
+  toast(CHAINS[idx].ico+' Switched to '+CHAINS[idx].name);
+  go('miners');
+}
+
+/* ============================================================
+   MODALS: settings / welcome back / hard reset
+   ============================================================ */
+function showModal(html){$('modalBox').innerHTML=html;$('modalWrap').classList.add('open');}
+function closeModal(){$('modalWrap').classList.remove('open');}
+$('modalWrap').addEventListener('click',e=>{if(e.target.id==='modalWrap')closeModal();});
+
+$('settingsBtn').addEventListener('click',openSettings);
+function openSettings(){
+  showModal(`<div class="modalTitle">⚙️ Settings</div>
+  <div class="setRow">🎵 Music<input type="range" min="0" max="1" step="0.05" value="${g.settings.music}" id="volMusic"></div>
+  <div class="setRow">🔔 SFX<input type="range" min="0" max="1" step="0.05" value="${g.settings.sfx}" id="volSfx"></div>
+  <div class="setRow"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="muteAll" ${g.settings.muted?'checked':''}> Mute everything</label></div>
+  <hr style="border-color:var(--line);margin:8px 0">
+  <div class="setRow" style="font-size:.75rem;color:var(--dim)">💾 Autosaves every 10s + on every purchase. Offline cap: ${offlineCapH()}h (extend in the Lab).</div>
+  <div class="setRow" style="font-size:.75rem;color:var(--dim)">📊 Playtime ${fmtTime(g.playSec||0)} · ${fmtInt(g.tapsTotal)} taps · ${fmt(g.chains[0].lifetime)} ₿M lifetime · prestiged ${g.chains[0].prestiges}×</div>
+  <div class="setRow"><button class="btn blue" style="flex:1" id="expBtn">📤 Export save</button>
+  <button class="btn blue" style="flex:1" id="impBtn">📥 Import save</button></div>
+  <textarea class="ioArea" id="ioArea" placeholder="Export puts your save here — copy it somewhere safe. Paste a save here and hit Import to restore."></textarea>
+  <hr style="border-color:var(--line);margin:8px 0">
+  <div class="setRow" style="font-size:.75rem;color:var(--red)">☠️ Danger zone: type <b>RESET</b> to enable full wipe.</div>
+  <input class="dangerInput" id="resetInput" placeholder="type RESET" autocomplete="off">
+  <button class="btn off" style="width:100%;margin-top:6px" id="resetBtn">🗑️ Erase EVERYTHING forever</button>
+  <div class="modalBtns"><button class="btn ghost" id="mClose">Close</button></div>`);
+  $('volMusic').addEventListener('input',e=>{g.settings.music=+e.target.value;applyVolumes();queueSave();});
+  $('volSfx').addEventListener('input',e=>{g.settings.sfx=+e.target.value;applyVolumes();sfxBuy();queueSave();});
+  $('muteAll').addEventListener('change',e=>{g.settings.muted=e.target.checked;applyVolumes();queueSave();});
+  $('expBtn').addEventListener('click',()=>{
+    $('ioArea').value=exportSave();
+    $('ioArea').select();
+    try{document.execCommand('copy');toast('📋 Save copied to clipboard!');}catch(e){toast('📤 Save exported — copy the text manually.');}
+  });
+  $('impBtn').addEventListener('click',()=>{
+    if(!$('ioArea').value.trim()){toast('Paste a save string first!');return;}
+    if(!importSave($('ioArea').value))toast('❌ That save could not be read.');
+  });
+  $('resetInput').addEventListener('input',e=>{
+    $('resetBtn').className='btn '+(e.target.value==='RESET'?'pink':'off');
+  });
+  $('resetBtn').addEventListener('click',()=>{
+    if($('resetInput').value!=='RESET'){shakeBtn($('resetBtn'));return;}
+    localStorage.removeItem(SAVE_KEY);
+    location.reload();
+  });
+  $('mClose').addEventListener('click',closeModal);
+}
+
+function showWelcome(res,elapsed){
+  const capped=res.t<elapsed;
+  showModal(`<div class="modalTitle">🌸 Welcome back!</div>
+  <div style="text-align:center">${chibiSVG(mgrArt(0,0),'happy')}</div>
+  <div class="modalBody" style="text-align:center">Your Operators kept mining for <b>${fmtTime(res.t)}</b>${capped?' (offline cap — extend it in the Lab!)':''}:</div>
+  <div class="bigCountUp num" id="wbCount">0</div>
+  ${res.perChain.map(p=>`<div class="welcomeCoin"><span>${CHAINS[p.c].coinIco} ${CHAINS[p.c].coin}</span><span class="num">+${fmt(p.sum)} ${CHAINS[p.c].sym}</span></div>`).join('')}
+  <div class="modalBtns"><button class="btn pink" id="wbOk">Let's HODL! ✨</button></div>`);
+  const target=res.total,t0=performance.now();
+  (function anim(){
+    const k=Math.min(1,(performance.now()-t0)/1600);
+    const eased=1-Math.pow(1-k,3);
+    $('wbCount').textContent='+'+fmt(target.mul(eased))+' total';
+    if(k<1&&$('wbCount'))requestAnimationFrame(anim);
+  })();
+  confettiBig();
+  $('wbOk').addEventListener('click',()=>{sfxWelcome();closeModal();});
+}
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+function updateBadges(){
+  const c=act(),ch=g.chains[c];
+  const hire=ch.rigs.filter((r,i)=>!r.mgr&&r.cnt>0&&ch.coins.gte(D.from(mgrDef(c,i).cost))).length;
+  setBdg('bdgOps',hire);
+  let tasks=0;
+  todaysDailies().forEach(t=>{if(!g.dailyClaimed[t.id]&&t.val(g)>=t.t)tasks++;});
+  MILESTONE_TASKS.forEach(t=>{try{if(!g.msClaimed[t.id]&&t.chk(g))tasks++;}catch(e){}});
+  setBdg('bdgTasks',tasks);
+  setBdg('bdgLab',RESEARCH.filter(canResearch).length);
+  setBdg('bdgPrestige',g.chains.some((x,ci)=>x&&dhGainAvailable(ci)>0)?'◈':0);
+  const ev=eventInfo(Date.now());
+  let evb=0;
+  if(ev.active){EV_TRACK.forEach((t,i)=>{if(!g.event.claimed[i]&&g.event.cur>=t.at)evb++;});if(!evb&&!g.event.pump&&Date.now()>=g.event.pumpCd)evb='!';}
+  setBdg('bdgEvents',evb);
+}
+function setBdg(id,v){
+  const el=$(id);
+  if(!v){el.style.display='none';return;}
+  el.style.display='flex';el.textContent=v;
+}
+
+/* ============================================================
+   SECTION: MAIN LOOP + INIT
+   ============================================================ */
+let lastWall=Date.now(),slowAcc=0,badgeAcc=0;
+function step(){
+  const now=Date.now();
+  let dt=(now-lastWall)/1000;lastWall=now;
+  if(dt<=0)return;
+  if(dt>120)dt=120;
+  if(dt>2){tick(dt);acc=0;}
+  else{acc+=dt;while(acc>=TICK){tick(TICK);acc-=TICK;}}
+}
+function frame(){
+  requestAnimationFrame(frame);
+  const rNow=performance.now(),rdt=Math.min(0.1,(rNow-lastFrame)/1000);
+  lastFrame=rNow;
+  step();
+  fxStep(rdt);
+  updateHUD(rdt);
+  updateRings();
+  slowAcc+=rdt;
+  if(slowAcc>=0.13){
+    const sdt=slowAcc;slowAcc=0;
+    buildScreen(ui.screen); // honors dirty flags
+    updateMiners();updateOps();updateTasks();updatePrestige();updateEvents();
+  }
+  badgeAcc+=rdt;
+  if(badgeAcc>=1){
+    badgeAcc=0;updateBadges();maybeCandle();
+    if(ui.screen==='chains')buildChains();          // keep unlock progress live
+    if(ui.screen==='lab'&&ui.dirty.lab)buildScreen('lab');
+  }
+}
+function init(){
+  const loaded=load();
+  g=loaded||freshState();
+  if(loaded){
+    const elapsed=(Date.now()-g.lastSaved)/1000;
+    if(elapsed>15){
+      const res=computeOffline(elapsed);
+      if(!res.total.isZero())showWelcome(res,elapsed);
+    }
+  }else{
+    setTimeout(()=>toast('🌸 Miko-chan is auto-mining your first rig — tap ⛏️ to speed things up!'),700);
+  }
+  hudDisp.coin=D.from(g.chains[act()].coins);
+  hudDisp.energy=g.energy;
+  ensureEvent();
+  go('miners');
+  addEventListener('beforeunload',save);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+  document.addEventListener('pointerdown',()=>{auInit();if(AU.ctx&&AU.ctx.state==='suspended')AU.ctx.resume();applyVolumes();});
+  setInterval(()=>{if(document.hidden)step();},1000);
+  requestAnimationFrame(frame);
+}
+init();
+</script>
+</body>
+</html>
